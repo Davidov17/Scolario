@@ -15,7 +15,7 @@ async function getScholarships() {
     const rows = json.table.rows || [];
 
     return rows
-      .map((row, index) => ({
+      .map((row: any, index: number) => ({
         id: index + 1,
         title: row.c?.[0]?.v || "",
         country: row.c?.[1]?.v || "",
@@ -24,7 +24,7 @@ async function getScholarships() {
         funding: row.c?.[4]?.v || "",
         link: row.c?.[5]?.v || "",
       }))
-      .filter((item) => item.title);
+      .filter((item: any) => item.title);
   } catch (error) {
     console.error("Error fetching scholarships:", error);
     return [];
@@ -119,7 +119,7 @@ export default async function Home() {
 
           <div className="grid md:grid-cols-3 gap-6">
             {featuredScholarships.length > 0 ? (
-              featuredScholarships.map((s) => (
+              featuredScholarships.map((s: any) => (
                 <div
                   key={s.id}
                   className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg hover:shadow-2xl transition border border-gray-100 flex flex-col h-full"
