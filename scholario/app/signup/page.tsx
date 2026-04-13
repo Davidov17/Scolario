@@ -49,7 +49,7 @@ export default function SignupPage() {
     return score;
   }
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -87,9 +87,28 @@ export default function SignupPage() {
       return;
     }
 
-    // SUCCESS
-    setSuccess("Account created successfully!");
+    // Call backend
+    try {
+      const res = await fetch("http://localhost:4000/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error || "Signup failed."); return; }
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+    } catch {
+      setError("Could not connect to server. Please try again.");
+      return;
+    }
 
+    setSuccess("Account created successfully!");
     setTimeout(() => {
       router.push("/profile");
     }, 1000);

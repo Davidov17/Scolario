@@ -16,7 +16,7 @@ export default function LoginPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   }
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
 
@@ -25,14 +25,20 @@ export default function LoginPage() {
       return;
     }
 
-    if (!formData.email.includes("@")) {
-      setError("Please enter a valid email address.");
-      return;
+    try {
+      const res = await fetch("http://localhost:4000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error || "Login failed."); return; }
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      router.push("/user");
+    } catch {
+      setError("Could not connect to server. Please try again.");
     }
-
-    // Save user session in localStorage
-    localStorage.setItem("user", JSON.stringify({ email: formData.email }));
-    router.push("/user");
   }
 
   return (

@@ -3,6 +3,7 @@ import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import scholarshipRoutes from "./routes/scholarships";
+import authRoutes from "./routes/auth";
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use(
 app.use(express.json());
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
+app.use("/api/auth", authRoutes);
 app.use("/api/scholarships", scholarshipRoutes);
 
 app.get("/", (_req, res) => {
