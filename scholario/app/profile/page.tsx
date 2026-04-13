@@ -4,6 +4,33 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "../../components/Navbar";
 
+type LanguageEntry = {
+  language: string;
+  proficiency: string;
+  certificate: string;
+  score: string;
+};
+
+const LANGUAGES = [
+  "English", "German", "French", "Spanish", "Chinese", "Japanese",
+  "Korean", "Arabic", "Russian", "Italian", "Portuguese", "Dutch",
+  "Turkish", "Polish", "Swedish", "Other",
+];
+
+const CERTIFICATES: Record<string, string[]> = {
+  English: ["IELTS", "TOEFL", "Cambridge B2 First", "Cambridge C1 Advanced", "PTE", "Duolingo English Test", "None"],
+  German: ["Goethe-Zertifikat", "TestDaF", "DSH", "None"],
+  French: ["DELF", "DALF", "TCF", "TEF", "None"],
+  Spanish: ["DELE", "SIELE", "None"],
+  Chinese: ["HSK", "None"],
+  Japanese: ["JLPT", "None"],
+  Korean: ["TOPIK", "None"],
+  Arabic: ["ALPT", "None"],
+  Russian: ["TORFL", "None"],
+};
+
+const DEFAULT_CERTS = ["None", "Other"];
+
 const countries = [
   "Afghanistan","Albania","Algeria","Andorra","Angola","Argentina","Armenia",
   "Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Belarus",
@@ -31,44 +58,61 @@ export default function ProfilePage() {
     country: "",
     major: "",
     gpa: 0,
-    ielts: "",
     fundingType: "",
     degreeLevel: "",
     age: "",
-    englishLevel: "",
-    otherLanguages: "",
     scholarshipStatus: "",
   });
+
+  const [languages, setLanguages] = useState<LanguageEntry[]>([
+    { language: "", proficiency: "", certificate: "", score: "" },
+  ]);
 
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
     const saved = localStorage.getItem("scholarioProfile");
     if (saved) {
-      setFormData(JSON.parse(saved));
+      const parsed = JSON.parse(saved);
+      const { languages: savedLangs, ...rest } = parsed;
+      setFormData(rest);
+      if (savedLangs?.length) setLanguages(savedLangs);
     }
   }, []);
 
-  function handleChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) {
+  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       [name]: name === "gpa" ? parseFloat(value) || 0 : value,
     }));
   }
 
+  function handleLanguageChange(index: number, field: keyof LanguageEntry, value: string) {
+    setLanguages((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      if (field === "language") {
+        updated[index].certificate = "";
+        updated[index].score = "";
+      }
+      return updated;
+    });
+  }
+
+  function addLanguage() {
+    setLanguages((prev) => [...prev, { language: "", proficiency: "", certificate: "", score: "" }]);
+  }
+
+  function removeLanguage(index: number) {
+    setLanguages((prev) => prev.filter((_, i) => i !== index));
+  }
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
-    localStorage.setItem("scholarioProfile", JSON.stringify(formData));
+    localStorage.setItem("scholarioProfile", JSON.stringify({ ...formData, languages }));
     setSuccess("Profile saved successfully!");
-
-    setTimeout(() => {
-      router.push("/user");
-    }, 1000);
+    setTimeout(() => router.push("/user"), 1000);
   }
 
   return (
@@ -172,39 +216,78 @@ export default function ProfilePage() {
             <div>
               <h2 className="text-lg font-semibold mb-3 text-gray-700">Language Proficiency</h2>
               <div className="space-y-4">
-                <select
-                  name="englishLevel"
-                  value={formData.englishLevel}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500"
+                {languages.map((entry, index) => (
+                  <div key={index} className="border border-gray-200 rounded-2xl p-4 space-y-3 relative">
+                    {languages.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeLanguage(index)}
+                        className="absolute top-3 right-3 text-red-400 hover:text-red-600 text-sm font-medium"
+                      >
+                        Remove
+                      </button>
+                    )}
+
+                    {/* Language */}
+                    <select
+                      value={entry.language}
+                      onChange={(e) => handleLanguageChange(index, "language", e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500"
+                    >
+                      <option value="">Select language</option>
+                      {LANGUAGES.map((l) => (
+                        <option key={l} value={l}>{l}</option>
+                      ))}
+                    </select>
+
+                    {/* Proficiency */}
+                    <select
+                      value={entry.proficiency}
+                      onChange={(e) => handleLanguageChange(index, "proficiency", e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500"
+                    >
+                      <option value="">Proficiency level</option>
+                      <option value="A1">A1 – Beginner</option>
+                      <option value="A2">A2 – Elementary</option>
+                      <option value="B1">B1 – Intermediate</option>
+                      <option value="B2">B2 – Upper Intermediate</option>
+                      <option value="C1">C1 – Advanced</option>
+                      <option value="C2">C2 – Mastery</option>
+                      <option value="Native">Native</option>
+                    </select>
+
+                    {/* Certificate */}
+                    <select
+                      value={entry.certificate}
+                      onChange={(e) => handleLanguageChange(index, "certificate", e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500"
+                    >
+                      <option value="">Certificate type (optional)</option>
+                      {(CERTIFICATES[entry.language] || DEFAULT_CERTS).map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+
+                    {/* Score */}
+                    {entry.certificate && entry.certificate !== "None" && (
+                      <input
+                        type="text"
+                        placeholder={`${entry.certificate} score (e.g. 7.5)`}
+                        value={entry.score}
+                        onChange={(e) => handleLanguageChange(index, "score", e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500"
+                      />
+                    )}
+                  </div>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={addLanguage}
+                  className="w-full border-2 border-dashed border-indigo-300 text-indigo-600 hover:border-indigo-500 py-3 rounded-xl text-sm font-medium transition"
                 >
-                  <option value="">English Level</option>
-                  <option value="Beginner">Beginner (A1–A2)</option>
-                  <option value="Intermediate">Intermediate (B1–B2)</option>
-                  <option value="Advanced">Advanced (C1–C2)</option>
-                  <option value="Native">Native</option>
-                </select>
-
-                <input
-                  type="number"
-                  name="ielts"
-                  placeholder="IELTS Score (e.g. 7.0)"
-                  value={formData.ielts}
-                  onChange={handleChange}
-                  step="0.5"
-                  min="0"
-                  max="9"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500"
-                />
-
-                <input
-                  type="text"
-                  name="otherLanguages"
-                  placeholder="Other languages (e.g. German B2, French A1)"
-                  value={formData.otherLanguages}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500"
-                />
+                  + Add another language
+                </button>
               </div>
             </div>
 
