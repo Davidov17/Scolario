@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "../../components/Navbar";
 
@@ -37,6 +37,13 @@ export default function ProfilePage() {
 
   const [success, setSuccess] = useState("");
 
+  useEffect(() => {
+    const saved = localStorage.getItem("scholarioProfile");
+    if (saved) {
+      setFormData(JSON.parse(saved));
+    }
+  }, []);
+
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) {
@@ -55,7 +62,7 @@ export default function ProfilePage() {
     setSuccess("Profile saved successfully!");
 
     setTimeout(() => {
-      router.push("/matches");
+      router.push("/user");
     }, 1000);
   }
 
@@ -65,9 +72,13 @@ export default function ProfilePage() {
 
       <main className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-gray-100 px-6 py-16">
         <div className="max-w-3xl mx-auto bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
-          <h1 className="text-3xl font-bold mb-2">Complete Your Profile</h1>
+          <h1 className="text-3xl font-bold mb-2">
+            {typeof window !== "undefined" && localStorage.getItem("scholarioProfile")
+              ? "Update Your Profile"
+              : "Complete Your Profile"}
+          </h1>
           <p className="text-gray-500 mb-8">
-            Tell us about yourself so we can match scholarships to you.
+            Fill in your details so we can match scholarships to you. All fields are optional but improve your matches.
           </p>
 
           <form className="space-y-4" onSubmit={handleSubmit}>
