@@ -9,6 +9,8 @@ type LanguageEntry = {
   proficiency: string;
   certificate: string;
   score: string;
+  fileUrl: string;
+  fileName: string;
 };
 
 type CertDoc = {
@@ -72,7 +74,7 @@ export default function ProfilePage() {
   });
 
   const [languages, setLanguages] = useState<LanguageEntry[]>([
-    { language: "", proficiency: "", certificate: "", score: "" },
+    { language: "", proficiency: "", certificate: "", score: "", fileUrl: "", fileName: "" },
   ]);
 
   const [certDocs, setCertDocs] = useState<CertDoc[]>([]);
@@ -152,8 +154,35 @@ export default function ProfilePage() {
     });
   }
 
+  function handleLanguageFile(index: number, e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 4 * 1024 * 1024) {
+      alert("File is too large. Max 4MB.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setLanguages((prev) => {
+        const updated = [...prev];
+        updated[index] = { ...updated[index], fileUrl: reader.result as string, fileName: file.name };
+        return updated;
+      });
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  }
+
+  function removeLanguageFile(index: number) {
+    setLanguages((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], fileUrl: "", fileName: "" };
+      return updated;
+    });
+  }
+
   function addLanguage() {
-    setLanguages((prev) => [...prev, { language: "", proficiency: "", certificate: "", score: "" }]);
+    setLanguages((prev) => [...prev, { language: "", proficiency: "", certificate: "", score: "", fileUrl: "", fileName: "" }]);
   }
 
   function removeLanguage(index: number) {
@@ -329,6 +358,27 @@ export default function ProfilePage() {
                         onChange={(e) => handleLanguageChange(index, "score", e.target.value)}
                         className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500"
                       />
+                    )}
+
+                    {/* Certificate Upload */}
+                    {entry.certificate && entry.certificate !== "None" && (
+                      <div>
+                        <p className="text-xs text-gray-500 mb-2 font-medium">Upload certificate (PDF, JPG, PNG — max 4MB)</p>
+                        {entry.fileUrl ? (
+                          <div className="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
+                            <span className="text-lg">{entry.fileName.endsWith(".pdf") ? "📄" : "🖼️"}</span>
+                            <span className="text-sm text-gray-700 flex-1 truncate">{entry.fileName}</span>
+                            <a href={entry.fileUrl} target="_blank" rel="noreferrer" className="text-xs text-indigo-600 hover:underline shrink-0">View</a>
+                            <button type="button" onClick={() => removeLanguageFile(index)} className="text-xs text-red-400 hover:text-red-600 shrink-0">Remove</button>
+                          </div>
+                        ) : (
+                          <label className="flex items-center gap-3 border-2 border-dashed border-indigo-200 hover:border-indigo-400 rounded-xl px-4 py-3 cursor-pointer transition">
+                            <span className="text-lg">📎</span>
+                            <span className="text-sm text-indigo-600">Click to upload {entry.certificate} certificate</span>
+                            <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => handleLanguageFile(index, e)} className="hidden" />
+                          </label>
+                        )}
+                      </div>
                     )}
                   </div>
                 ))}
