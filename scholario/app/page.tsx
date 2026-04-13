@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import Navbar from "../components/Navbar";
+import HeroCTA from "../components/HeroCTA";
 
 const SHEET_ID = "1V71nSZuWQ6C-cJeEiu7yROCXZeEExwAcbqe9NUANaIU";
 
@@ -56,21 +57,7 @@ export default async function Home() {
               faster, smarter, and all in one place.
             </p>
 
-            <div className="flex justify-center gap-4 flex-wrap">
-              <Link
-                href="/signup"
-                className="bg-white text-black px-6 py-3 rounded-xl font-medium shadow-lg hover:scale-105 transition"
-              >
-                Get Started
-              </Link>
-
-              <Link
-                href="/scholarships"
-                className="border border-white px-6 py-3 rounded-xl hover:bg-white hover:text-black transition"
-              >
-                Browse Scholarships
-              </Link>
-            </div>
+            <HeroCTA />
           </div>
         </section>
 
