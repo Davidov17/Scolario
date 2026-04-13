@@ -11,6 +11,13 @@ type LanguageEntry = {
   score: string;
 };
 
+type CertDoc = {
+  name: string;
+  label: string;
+  dataUrl: string;
+  size: string;
+};
+
 const LANGUAGES = [
   "English", "German", "French", "Spanish", "Chinese", "Japanese",
   "Korean", "Arabic", "Russian", "Italian", "Portuguese", "Dutch",
@@ -68,17 +75,62 @@ export default function ProfilePage() {
     { language: "", proficiency: "", certificate: "", score: "" },
   ]);
 
+  const [certDocs, setCertDocs] = useState<CertDoc[]>([]);
+  const [uploadError, setUploadError] = useState("");
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
     const saved = localStorage.getItem("scholarioProfile");
     if (saved) {
       const parsed = JSON.parse(saved);
-      const { languages: savedLangs, ...rest } = parsed;
+      const { languages: savedLangs, certDocs: savedDocs, ...rest } = parsed;
       setFormData(rest);
       if (savedLangs?.length) setLanguages(savedLangs);
+      if (savedDocs?.length) setCertDocs(savedDocs);
     }
   }, []);
+
+  function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    setUploadError("");
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const maxSize = 4 * 1024 * 1024; // 4MB
+    if (file.size > maxSize) {
+      setUploadError("File is too large. Maximum size is 4MB.");
+      return;
+    }
+
+    const allowed = ["application/pdf", "image/jpeg", "image/png", "image/jpg"];
+    if (!allowed.includes(file.type)) {
+      setUploadError("Only PDF, JPG, and PNG files are allowed.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      const sizeKb = (file.size / 1024).toFixed(1);
+      setCertDocs((prev) => [
+        ...prev,
+        { name: file.name, label: file.name.replace(/\.[^/.]+$/, ""), dataUrl, size: `${sizeKb} KB` },
+      ]);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  }
+
+  function removeCertDoc(index: number) {
+    setCertDocs((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function updateCertLabel(index: number, label: string) {
+    setCertDocs((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], label };
+      return updated;
+    });
+  }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = e.target;
@@ -110,7 +162,7 @@ export default function ProfilePage() {
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    localStorage.setItem("scholarioProfile", JSON.stringify({ ...formData, languages }));
+    localStorage.setItem("scholarioProfile", JSON.stringify({ ...formData, languages, certDocs }));
     setSuccess("Profile saved successfully!");
     setTimeout(() => router.push("/user"), 1000);
   }
@@ -305,6 +357,65 @@ export default function ProfilePage() {
                 <option value="Reapplying">Reapplying</option>
                 <option value="Currently funded">Currently funded</option>
               </select>
+            </div>
+
+            {/* Certificate Upload */}
+            <div>
+              <h2 className="text-lg font-semibold mb-1 text-gray-700">Upload Certificates</h2>
+              <p className="text-sm text-gray-400 mb-3">PDF, JPG, or PNG — max 4MB per file</p>
+
+              <div className="space-y-3">
+                {certDocs.map((doc, index) => (
+                  <div key={index} className="flex items-center gap-3 border border-gray-200 rounded-xl p-3">
+                    <div className="text-2xl">
+                      {doc.name.endsWith(".pdf") ? "📄" : "🖼️"}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <input
+                        type="text"
+                        value={doc.label}
+                        onChange={(e) => updateCertLabel(index, e.target.value)}
+                        className="w-full text-sm font-medium border-b border-gray-200 focus:outline-none focus:border-indigo-500 pb-0.5 mb-1"
+                        placeholder="Certificate name"
+                      />
+                      <p className="text-xs text-gray-400">{doc.name} · {doc.size}</p>
+                    </div>
+                    <a
+                      href={doc.dataUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs text-indigo-600 hover:underline shrink-0"
+                    >
+                      View
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => removeCertDoc(index)}
+                      className="text-xs text-red-400 hover:text-red-600 shrink-0"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+
+                <label className="flex flex-col items-center justify-center w-full border-2 border-dashed border-indigo-300 hover:border-indigo-500 rounded-2xl py-6 cursor-pointer transition">
+                  <span className="text-3xl mb-2">📎</span>
+                  <span className="text-sm text-indigo-600 font-medium">Click to upload a certificate</span>
+                  <span className="text-xs text-gray-400 mt-1">PDF, JPG, PNG — max 4MB</span>
+                  <input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                </label>
+
+                {uploadError && (
+                  <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2">
+                    {uploadError}
+                  </p>
+                )}
+              </div>
             </div>
 
             {success && (
