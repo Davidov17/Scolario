@@ -53,102 +53,96 @@ export default function LoginPage() {
     }
   }
 
-  const inputClass = "w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder:text-slate-400";
-
   return (
-    <>
-      <Navbar />
-      <main className="min-h-screen bg-slate-50 flex items-stretch">
+    <main className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)" }}>
 
-        {/* Left photo panel */}
-        <div className="hidden md:block md:w-1/2 relative">
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: "url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80')" }}
-          />
-          <div className="absolute inset-0 bg-slate-900/65" />
-          <div className="relative h-full flex flex-col justify-end p-12">
-            <span className="inline-block px-3 py-1 rounded-full bg-white/15 border border-white/25 text-white text-xs font-semibold uppercase tracking-widest mb-5">
-              Welcome back
-            </span>
-            <h2 className="text-3xl font-bold text-white leading-tight mb-3">
-              Your scholarship journey continues here.
-            </h2>
-            <p className="text-slate-300 text-sm leading-relaxed">
-              Access your personalized matches, saved scholarships, and deadlines all in one place.
-            </p>
+      {/* Soft background blobs */}
+      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 rounded-full opacity-20 blur-3xl" style={{ background: "radial-gradient(circle, #fff 0%, transparent 70%)" }} />
+      <div className="absolute bottom-[-10%] right-[-5%] w-80 h-80 rounded-full opacity-15 blur-3xl" style={{ background: "radial-gradient(circle, #fff 0%, transparent 70%)" }} />
+
+      {/* Card */}
+      <div className="relative w-full max-w-sm mx-4 bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl px-8 py-10">
+
+        {/* Logo */}
+        <div className="flex items-center justify-center gap-2 mb-8">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, #667eea, #764ba2)" }}>
+            <span className="text-white font-bold text-sm">S</span>
           </div>
+          <span className="text-xl font-bold text-slate-800 tracking-tight">Scholario</span>
         </div>
 
-        {/* Right form panel */}
-        <div className="w-full md:w-1/2 flex items-center justify-center px-8 py-16">
-          <div className="w-full max-w-md">
-            <h2 className="text-2xl font-bold text-slate-900 mb-1">Log In</h2>
-            <p className="text-slate-400 text-sm mb-8">Enter your credentials to continue</p>
+        <h1 className="text-2xl font-bold text-slate-800 text-center mb-1">Welcome back</h1>
+        <p className="text-slate-400 text-sm text-center mb-8">Sign in to your account</p>
 
-            <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Email</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="you@example.com"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:border-transparent placeholder:text-slate-300"
+              style={{ "--tw-ring-color": "#667eea" } as React.CSSProperties}
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Password</label>
+            <div className="relative">
               <input
-                type="email"
-                name="email"
-                placeholder="Email Address"
-                value={formData.email}
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="••••••••"
+                value={formData.password}
                 onChange={handleChange}
-                className={inputClass}
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:border-transparent placeholder:text-slate-300"
               />
-
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  placeholder="Password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className={inputClass}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-indigo-600 hover:text-indigo-800"
-                >
-                  {showPassword ? "Hide" : "Show"}
-                </button>
-              </div>
-
-              {error && (
-                <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
-                  {error}
-                </p>
-              )}
-
               <button
-                type="submit"
-                className="w-full bg-slate-900 hover:bg-slate-700 text-white py-3 rounded-xl font-semibold text-sm transition-colors shadow-sm"
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400 hover:text-slate-600"
               >
-                Log In
+                {showPassword ? "Hide" : "Show"}
               </button>
-            </form>
-
-            <div className="flex items-center justify-between mt-6 text-sm">
-              <p className="text-slate-400">
-                Don&apos;t have an account?{" "}
-                <Link href="/signup" className="text-indigo-600 hover:text-indigo-800 font-semibold">
-                  Sign up free
-                </Link>
-              </p>
-              <Link href="/forgot-password" className="text-slate-400 hover:text-indigo-600 transition-colors">
-                Forgot password?
-              </Link>
-            </div>
-
-            <div className="border-t border-slate-100 mt-8 pt-5 text-center">
-              <Link href="/admin/login" className="text-xs text-slate-300 hover:text-slate-500 transition-colors">
-                Admin portal →
-              </Link>
             </div>
           </div>
-        </div>
 
-      </main>
-    </>
+          <div className="flex justify-end">
+            <Link href="/forgot-password" className="text-xs text-slate-400 hover:text-slate-600 transition-colors">
+              Forgot password?
+            </Link>
+          </div>
+
+          {error && (
+            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+              {error}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            className="w-full text-white py-3 rounded-xl font-semibold text-sm transition-all shadow-lg hover:shadow-xl hover:opacity-90 active:scale-95"
+            style={{ background: "linear-gradient(135deg, #667eea, #764ba2)" }}
+          >
+            Sign In
+          </button>
+        </form>
+
+        <p className="text-center text-sm text-slate-400 mt-6">
+          Don&apos;t have an account?{" "}
+          <Link href="/signup" className="font-semibold hover:opacity-80 transition-opacity" style={{ color: "#667eea" }}>
+            Sign up free
+          </Link>
+        </p>
+
+        <div className="text-center mt-4">
+          <Link href="/admin/login" className="text-xs text-slate-300 hover:text-slate-400 transition-colors">
+            Admin portal →
+          </Link>
+        </div>
+      </div>
+    </main>
   );
 }
