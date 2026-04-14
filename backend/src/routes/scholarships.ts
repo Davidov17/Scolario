@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import multer from "multer";
 import * as XLSX from "xlsx";
 import { Scholarship } from "../models/Scholarship";
+import { requireAdmin } from "../middleware/auth";
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -37,7 +38,7 @@ router.get("/:id", async (req: Request, res: Response) => {
 
 // ─── POST /api/scholarships ──────────────────────────────────────────────────
 // Create a single scholarship manually (from backend admin)
-router.post("/", async (req: Request, res: Response) => {
+router.post("/", requireAdmin, async (req: Request, res: Response) => {
   try {
     const scholarship = new Scholarship({ ...req.body, source: "manual" });
     await scholarship.save();
@@ -48,7 +49,7 @@ router.post("/", async (req: Request, res: Response) => {
 });
 
 // ─── PUT /api/scholarships/:id ───────────────────────────────────────────────
-router.put("/:id", async (req: Request, res: Response) => {
+router.put("/:id", requireAdmin, async (req: Request, res: Response) => {
   try {
     const scholarship = await Scholarship.findByIdAndUpdate(
       req.params.id,
@@ -66,7 +67,7 @@ router.put("/:id", async (req: Request, res: Response) => {
 });
 
 // ─── DELETE /api/scholarships/:id ───────────────────────────────────────────
-router.delete("/:id", async (req: Request, res: Response) => {
+router.delete("/:id", requireAdmin, async (req: Request, res: Response) => {
   try {
     await Scholarship.findByIdAndDelete(req.params.id);
     res.json({ message: "Deleted successfully" });
@@ -80,6 +81,7 @@ router.delete("/:id", async (req: Request, res: Response) => {
 // Expected columns: Title, Country, Funding, Deadline, Description, Requirements, Link, Featured
 router.post(
   "/import/spreadsheet",
+  requireAdmin,
   upload.single("file"),
   async (req: Request, res: Response) => {
     try {
@@ -103,6 +105,7 @@ router.post(
         title: row["Title"] || row["title"] || "",
         country: row["Country"] || row["country"] || "",
         funding: row["Funding"] || row["funding"] || "",
+        degreeLevel: row["DegreeLevel"] || row["Degree Level"] || row["degree"] || row["Degree"] || "",
         deadline: row["Deadline"] || row["deadline"] || "",
         description: row["Description"] || row["description"] || "",
         requirements: row["Requirements"] || row["requirements"] || "",

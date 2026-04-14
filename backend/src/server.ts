@@ -4,6 +4,11 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import scholarshipRoutes from "./routes/scholarships";
 import authRoutes from "./routes/auth";
+import profileRoutes from "./routes/profile";
+import bookmarkRoutes from "./routes/bookmarks";
+import applicationRoutes from "./routes/applications";
+import notificationRoutes from "./routes/notifications";
+import userRoutes from "./routes/users";
 
 dotenv.config();
 
@@ -24,6 +29,11 @@ app.use(express.json());
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.use("/api/auth", authRoutes);
 app.use("/api/scholarships", scholarshipRoutes);
+app.use("/api/profile", profileRoutes);
+app.use("/api/bookmarks", bookmarkRoutes);
+app.use("/api/applications", applicationRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/users", userRoutes);
 
 app.get("/", (_req, res) => {
   res.json({ status: "Scolario API is running" });

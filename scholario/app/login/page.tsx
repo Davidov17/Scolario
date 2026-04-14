@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Navbar from "../../components/Navbar";
@@ -10,6 +10,14 @@ export default function LoginPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const stored = localStorage.getItem("user");
+    if (!stored) return;
+    const user = JSON.parse(stored);
+    if (user.isAdmin) router.replace("/admin");
+    else router.replace("/user");
+  }, [router]);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -26,13 +34,17 @@ export default function LoginPage() {
     }
 
     try {
-      const res = await fetch("http://localhost:4000/api/auth/login", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api"}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || "Login failed."); return; }
+      if (data.user.isAdmin) {
+        setError("Admin accounts must sign in through the admin portal.");
+        return;
+      }
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
       router.push("/user");
@@ -116,12 +128,23 @@ export default function LoginPage() {
               </button>
             </form>
 
-            <p className="text-sm text-slate-400 text-center mt-6">
-              Don&apos;t have an account?{" "}
-              <Link href="/signup" className="text-indigo-600 hover:text-indigo-800 font-semibold">
-                Sign up free
+            <div className="flex items-center justify-between mt-6 text-sm">
+              <p className="text-slate-400">
+                Don&apos;t have an account?{" "}
+                <Link href="/signup" className="text-indigo-600 hover:text-indigo-800 font-semibold">
+                  Sign up free
+                </Link>
+              </p>
+              <Link href="/forgot-password" className="text-slate-400 hover:text-indigo-600 transition-colors">
+                Forgot password?
               </Link>
-            </p>
+            </div>
+
+            <div className="border-t border-slate-100 mt-8 pt-5 text-center">
+              <Link href="/admin/login" className="text-xs text-slate-300 hover:text-slate-500 transition-colors">
+                Admin portal →
+              </Link>
+            </div>
           </div>
         </div>
 

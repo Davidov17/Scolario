@@ -7,12 +7,14 @@
     "dev": "ts-node-dev --respawn src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "seed": "ts-node src/seed.ts"
+    "seed": "ts-node src/seed.ts",
+    "create-admin": "ts-node src/create-admin.ts"
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.1.0",
+    "@types/nodemailer": "^8.0.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -20,6 +22,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.4.0",
     "multer": "^2.1.1",
+    "nodemailer": "^8.0.5",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

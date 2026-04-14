@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "../../components/Navbar";
+import { getProfile, saveProfile } from "../../lib/api";
 
 type LanguageEntry = {
   language: string;
@@ -94,15 +95,37 @@ export default function ProfilePage() {
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    const saved = localStorage.getItem("scholarioProfile");
-    if (saved) {
-      setIsExisting(true);
-      const parsed = JSON.parse(saved);
-      const { languages: savedLangs, certDocs: savedDocs, ...rest } = parsed;
-      setFormData((prev) => ({ ...prev, ...rest }));
-      if (savedLangs?.length) setLanguages(savedLangs);
-      if (savedDocs?.length) setCertDocs(savedDocs);
+    async function loadProfile() {
+      const token = localStorage.getItem("token");
+      // Try backend first if user is logged in
+      if (token) {
+        const remote = await getProfile(token);
+        if (remote) {
+          setIsExisting(true);
+          const { languages: savedLangs, certDocs: savedDocs, _id, userId, __v, createdAt, updatedAt, ...rest } = remote as any;
+          setFormData((prev) => ({ ...prev, ...rest }));
+          if (savedLangs?.length) setLanguages(savedLangs);
+          // certDocs are only in localStorage (not stored in backend)
+          const local = localStorage.getItem("scholarioProfile");
+          if (local) {
+            const parsed = JSON.parse(local);
+            if (parsed.certDocs?.length) setCertDocs(parsed.certDocs);
+          }
+          return;
+        }
+      }
+      // Fallback to localStorage
+      const saved = localStorage.getItem("scholarioProfile");
+      if (saved) {
+        setIsExisting(true);
+        const parsed = JSON.parse(saved);
+        const { languages: savedLangs, certDocs: savedDocs, ...rest } = parsed;
+        setFormData((prev) => ({ ...prev, ...rest }));
+        if (savedLangs?.length) setLanguages(savedLangs);
+        if (savedDocs?.length) setCertDocs(savedDocs);
+      }
     }
+    loadProfile();
   }, []);
 
   function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -198,9 +221,15 @@ export default function ProfilePage() {
     setLanguages((prev) => prev.filter((_, i) => i !== index));
   }
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    // Always save to localStorage (includes certDocs which aren't sent to backend)
     localStorage.setItem("scholarioProfile", JSON.stringify({ ...formData, languages, certDocs }));
+    // Also save to backend if logged in
+    const token = localStorage.getItem("token");
+    if (token) {
+      await saveProfile(token, { ...formData, languages });
+    }
     setSuccess("Profile saved successfully!");
     setTimeout(() => router.push("/user"), 1000);
   }

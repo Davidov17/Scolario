@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Navbar from "../../components/Navbar";
+import { getScholarships, getProfile, getBookmarks, getApplications } from "../../lib/api";
+import type { Scholarship, Application } from "../../lib/api";
 
-const SHEET_ID = "1V71nSZuWQ6C-cJeEiu7yROCXZeEExwAcbqe9NUANaIU";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
 
 type Profile = {
   firstName: string;
@@ -16,58 +18,103 @@ type Profile = {
   ielts: string;
   fundingType: string;
   degreeLevel: string;
+  languages?: { language: string; proficiency: string; certificate: string; score: string }[];
 };
 
-type Scholarship = {
-  id: number;
-  title: string;
-  country: string;
-  degree: string;
-  deadline: string;
-  funding: string;
-  link: string;
+type ScoredScholarship = Scholarship & { matchScore: number; matchReasons: string[] };
+
+// Language requirements by country (what language proficiency is typically needed)
+const COUNTRY_LANGUAGES: Record<string, string> = {
+  germany: "german", france: "french", spain: "spanish", italy: "italian",
+  china: "chinese", japan: "japanese", "south korea": "korean", turkey: "turkish",
+  russia: "russian", "saudi arabia": "arabic", "united arab emirates": "arabic",
+  jordan: "arabic", egypt: "arabic", morocco: "arabic",
 };
 
-async function fetchScholarships(): Promise<Scholarship[]> {
-  try {
-    const res = await fetch(
-      `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`,
-      { cache: "no-store" }
-    );
-    const text = await res.text();
-    const json = JSON.parse(text.substring(47).slice(0, -2));
-    const rows = json.table.rows || [];
-    return rows
-      .map((row: any) => ({
-        title: row.c?.[0]?.v || "",
-        country: row.c?.[1]?.v || "",
-        degree: row.c?.[2]?.v || "",
-        funding: row.c?.[3]?.v || "",
-        deadline: row.c?.[4]?.v || "",
-        link: row.c?.[5]?.v || "",
-      }))
-      .filter((s: any) => s.title)
-      .map((item: any, index: number) => ({ ...item, id: index + 1 }));
-  } catch {
-    return [];
+function scoreScholarship(s: Scholarship, profile: Profile): ScoredScholarship {
+  let score = 0;
+  const reasons: string[] = [];
+
+  // 1. Degree level match (strong signal — 40pts)
+  if (profile.degreeLevel && s.degreeLevel) {
+    const profileDeg = profile.degreeLevel.toLowerCase();
+    const scholarshipDeg = s.degreeLevel.toLowerCase();
+    if (
+      scholarshipDeg.includes(profileDeg) ||
+      profileDeg.includes(scholarshipDeg) ||
+      (profileDeg.includes("bachelor") && scholarshipDeg.includes("bachelor")) ||
+      (profileDeg.includes("master") && scholarshipDeg.includes("master"))
+    ) {
+      score += 40;
+      reasons.push("Degree level matches");
+    }
   }
+
+  // 2. Funding type match (strong signal — 30pts)
+  if (profile.fundingType && s.funding) {
+    const pFunding = profile.fundingType.toLowerCase();
+    const sFunding = s.funding.toLowerCase();
+    if (sFunding.includes(pFunding) || sFunding.includes("full")) {
+      score += 30;
+      reasons.push("Funding type matches");
+    }
+  }
+
+  // 3. Language proficiency match (15pts)
+  if (profile.languages?.length) {
+    const countryKey = s.country?.toLowerCase();
+    const requiredLang = COUNTRY_LANGUAGES[countryKey] || "english";
+    const hasLang = profile.languages.some(
+      (l) => l.language.toLowerCase() === requiredLang && l.score
+    );
+    if (hasLang) {
+      score += 15;
+      reasons.push("Language proficiency available");
+    } else if (profile.languages.some((l) => l.language.toLowerCase() === "english" && l.score)) {
+      // English is a universal plus
+      score += 8;
+      reasons.push("English proficiency available");
+    }
+  }
+
+  // 4. GPA check (15pts) — reward high GPA (3.0+ / 75%+)
+  if (profile.gpa) {
+    const gpa = parseFloat(profile.gpa);
+    if (!isNaN(gpa)) {
+      if (gpa >= 3.5 || (gpa >= 85 && gpa <= 100)) {
+        score += 15;
+        reasons.push("Strong GPA");
+      } else if (gpa >= 3.0 || (gpa >= 75 && gpa <= 100)) {
+        score += 8;
+        reasons.push("Good GPA");
+      }
+    }
+  }
+
+  // If no profile criteria matched at all, give a base score so all show
+  if (score === 0) score = 1;
+
+  return { ...s, matchScore: score, matchReasons: reasons };
 }
 
-function matchScholarships(scholarships: Scholarship[], profile: Profile): Scholarship[] {
-  return scholarships.filter((s) => {
-    const fundingMatch =
-      !profile.fundingType ||
-      s.funding?.toLowerCase().includes(profile.fundingType.toLowerCase());
-    return fundingMatch;
-  });
+function matchScholarships(scholarships: Scholarship[], profile: Profile): ScoredScholarship[] {
+  return scholarships
+    .map((s) => scoreScholarship(s, profile))
+    .sort((a, b) => b.matchScore - a.matchScore);
 }
 
 export default function UserPage() {
   const router = useRouter();
   const [user, setUser] = useState<{ firstName: string; email: string } | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [matches, setMatches] = useState<Scholarship[]>([]);
+  const [matches, setMatches] = useState<ScoredScholarship[]>([]);
+  const [bookmarks, setBookmarks] = useState<Scholarship[]>([]);
+  const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
+  const [notifEnabled, setNotifEnabled] = useState(true);
+  const [notifDays, setNotifDays] = useState(7);
+  const [notifSaving, setNotifSaving] = useState(false);
+  const [notifMsg, setNotifMsg] = useState("");
 
   useEffect(() => {
     const stored = localStorage.getItem("user");
@@ -77,15 +124,39 @@ export default function UserPage() {
     }
     setUser(JSON.parse(stored));
 
-    const storedProfile = localStorage.getItem("scholarioProfile");
-    const parsedProfile: Profile | null = storedProfile ? JSON.parse(storedProfile) : null;
-    setProfile(parsedProfile);
+    async function loadData(token: string | null) {
+      // Try backend profile first, then fall back to localStorage
+      let parsedProfile: Profile | null = null;
+      if (token) {
+        const remote = await getProfile(token);
+        if (remote) {
+          parsedProfile = remote as unknown as Profile;
+        }
+      }
+      if (!parsedProfile) {
+        const storedProfile = localStorage.getItem("scholarioProfile");
+        parsedProfile = storedProfile ? JSON.parse(storedProfile) : null;
+      }
+      setProfile(parsedProfile);
 
-    fetchScholarships().then((all) => {
-      const matched = parsedProfile ? matchScholarships(all, parsedProfile) : all.slice(0, 6);
+      const all = await getScholarships();
+      const matched = parsedProfile
+        ? matchScholarships(all, parsedProfile)
+        : all.slice(0, 6).map((s) => ({ ...s, matchScore: 0, matchReasons: [] }));
       setMatches(matched);
       setLoading(false);
-    });
+    }
+
+    const token = localStorage.getItem("token");
+    loadData(token);
+    if (token) {
+      getBookmarks(token).then(setBookmarks);
+      getApplications(token).then(setApplications);
+      fetch(`${API}/notifications/prefs`, { headers: { Authorization: `Bearer ${token}` } })
+        .then((r) => r.json())
+        .then((d) => { setNotifEnabled(d.emailEnabled ?? true); setNotifDays(d.daysBeforeDeadline ?? 7); })
+        .catch(() => {});
+    }
   }, [router]);
 
   if (!user) return null;
@@ -122,9 +193,10 @@ export default function UserPage() {
         <div className="max-w-6xl mx-auto px-8 py-12">
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-10">
             {[
               { label: "Matched Scholarships", value: loading ? "—" : String(matches.length), accent: true },
+              { label: "Bookmarked", value: String(bookmarks.length), accent: false },
               { label: "Funding Preference", value: profile?.fundingType || "Not set", accent: false },
               { label: "Degree Level", value: profile?.degreeLevel || "Not set", accent: false },
             ].map((stat) => (
@@ -211,14 +283,25 @@ export default function UserPage() {
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {matches.map((s) => (
                     <div
-                      key={s.id}
+                      key={s._id}
                       className="border border-slate-200 rounded-2xl p-5 flex flex-col hover:shadow-md hover:border-slate-300 transition-all bg-white"
                     >
-                      <span className="inline-block px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-semibold mb-3 self-start">
-                        {s.degree || "Scholarship"}
-                      </span>
+                      <div className="flex items-start justify-between mb-3">
+                        <span className="inline-block px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-semibold">
+                          {s.degreeLevel || "Scholarship"}
+                        </span>
+                        {profile && s.matchScore > 0 && (
+                          <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold ${
+                            s.matchScore >= 70 ? "bg-emerald-100 text-emerald-700" :
+                            s.matchScore >= 40 ? "bg-amber-100 text-amber-700" :
+                            "bg-slate-100 text-slate-500"
+                          }`}>
+                            {s.matchScore >= 70 ? "Strong match" : s.matchScore >= 40 ? "Good match" : "Partial match"}
+                          </span>
+                        )}
+                      </div>
                       <h3 className="font-bold text-slate-900 mb-3 leading-snug text-sm">{s.title}</h3>
-                      <div className="space-y-1.5 flex-1 mb-4">
+                      <div className="space-y-1.5 flex-1 mb-3">
                         <div className="flex justify-between text-xs">
                           <span className="text-slate-400">Country</span>
                           <span className="font-medium text-slate-700">{s.country || "—"}</span>
@@ -232,8 +315,17 @@ export default function UserPage() {
                           <span className="font-medium text-slate-700">{s.deadline || "—"}</span>
                         </div>
                       </div>
+                      {profile && s.matchReasons.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mb-3">
+                          {s.matchReasons.map((r) => (
+                            <span key={r} className="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 text-[10px] font-medium">
+                              {r}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                       <Link
-                        href={`/scholarships/${s.id}`}
+                        href={`/scholarships/${s._id}`}
                         className="block text-center bg-slate-900 hover:bg-slate-700 text-white py-2 rounded-xl text-xs font-semibold transition-colors"
                       >
                         View Details
@@ -244,6 +336,166 @@ export default function UserPage() {
               )}
             </div>
           </div>
+          {/* Application Tracking */}
+          {applications.length > 0 && (
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mt-8">
+              <div className="px-6 py-5 border-b border-slate-100">
+                <h2 className="text-lg font-bold text-slate-900">My Applications</h2>
+                <p className="text-slate-400 text-sm mt-0.5">Scholarships you are tracking</p>
+              </div>
+              <div className="divide-y divide-slate-100">
+                {applications.map((app) => {
+                  const s = app.scholarshipId;
+                  const statusColors: Record<string, string> = {
+                    saved: "bg-slate-100 text-slate-600",
+                    applied: "bg-blue-100 text-blue-700",
+                    pending: "bg-amber-100 text-amber-700",
+                    accepted: "bg-emerald-100 text-emerald-700",
+                    rejected: "bg-red-100 text-red-600",
+                  };
+                  return (
+                    <div key={app._id} className="flex items-center gap-4 px-6 py-4 hover:bg-slate-50 transition-colors">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-slate-900 text-sm truncate">{s.title}</p>
+                        <p className="text-xs text-slate-400 mt-0.5">{s.country} · {s.deadline || "No deadline"}</p>
+                      </div>
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold capitalize shrink-0 ${statusColors[app.status] || "bg-slate-100 text-slate-600"}`}>
+                        {app.status}
+                      </span>
+                      <Link
+                        href={`/scholarships/${s._id}`}
+                        className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold shrink-0"
+                      >
+                        View →
+                      </Link>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Email Notifications */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mt-8">
+            <div className="px-6 py-5 border-b border-slate-100">
+              <h2 className="text-lg font-bold text-slate-900">Deadline Reminders</h2>
+              <p className="text-slate-400 text-sm mt-0.5">Get email reminders before your bookmarked scholarships close</p>
+            </div>
+            <div className="px-6 py-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-slate-700">Email notifications</span>
+                <button
+                  onClick={() => setNotifEnabled((v) => !v)}
+                  className={`relative w-11 h-6 rounded-full transition-colors ${notifEnabled ? "bg-indigo-500" : "bg-slate-200"}`}
+                >
+                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${notifEnabled ? "translate-x-5" : ""}`} />
+                </button>
+              </div>
+              {notifEnabled && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Remind me <strong>{notifDays} days</strong> before the deadline
+                  </label>
+                  <input
+                    type="range"
+                    min={1}
+                    max={30}
+                    value={notifDays}
+                    onChange={(e) => setNotifDays(Number(e.target.value))}
+                    className="w-full accent-indigo-600"
+                  />
+                  <div className="flex justify-between text-xs text-slate-400 mt-1">
+                    <span>1 day</span><span>30 days</span>
+                  </div>
+                </div>
+              )}
+              {notifMsg && <p className="text-sm text-emerald-600">{notifMsg}</p>}
+              <div className="flex gap-3 flex-wrap">
+                <button
+                  disabled={notifSaving}
+                  onClick={async () => {
+                    const token = localStorage.getItem("token");
+                    if (!token) return;
+                    setNotifSaving(true);
+                    await fetch(`${API}/notifications/prefs`, {
+                      method: "PUT",
+                      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+                      body: JSON.stringify({ emailEnabled: notifEnabled, daysBeforeDeadline: notifDays }),
+                    });
+                    setNotifMsg("Preferences saved!");
+                    setNotifSaving(false);
+                    setTimeout(() => setNotifMsg(""), 2500);
+                  }}
+                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-semibold transition-colors disabled:opacity-60"
+                >
+                  {notifSaving ? "Saving…" : "Save Preferences"}
+                </button>
+                {bookmarks.length > 0 && (
+                  <button
+                    onClick={async () => {
+                      const token = localStorage.getItem("token");
+                      if (!token) return;
+                      const res = await fetch(`${API}/notifications/send-reminders`, {
+                        method: "POST",
+                        headers: { Authorization: `Bearer ${token}` },
+                      });
+                      const data = await res.json();
+                      setNotifMsg(data.message + (data.previewUrl ? ` Preview: ${data.previewUrl}` : ""));
+                      setTimeout(() => setNotifMsg(""), 8000);
+                    }}
+                    className="px-5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold transition-colors"
+                  >
+                    Send Test Reminder
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Bookmarked Scholarships */}
+          {bookmarks.length > 0 && (
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mt-8">
+              <div className="px-6 py-5 border-b border-slate-100">
+                <h2 className="text-lg font-bold text-slate-900">Bookmarked Scholarships</h2>
+                <p className="text-slate-400 text-sm mt-0.5">Scholarships you saved for later</p>
+              </div>
+              <div className="p-6">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {bookmarks.map((s) => (
+                    <div key={s._id} className="border border-amber-200 bg-amber-50/30 rounded-2xl p-5 flex flex-col hover:shadow-md transition-all">
+                      <div className="flex items-start justify-between mb-3">
+                        <span className="inline-block px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold">
+                          {s.degreeLevel || "Scholarship"}
+                        </span>
+                      </div>
+                      <h3 className="font-bold text-slate-900 mb-3 leading-snug text-sm">{s.title}</h3>
+                      <div className="space-y-1.5 flex-1 mb-4">
+                        <div className="flex justify-between text-xs">
+                          <span className="text-slate-400">Country</span>
+                          <span className="font-medium text-slate-700">{s.country || "—"}</span>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-slate-400">Deadline</span>
+                          <span className="font-medium text-slate-700">{s.deadline || "—"}</span>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-slate-400">Funding</span>
+                          <span className="font-medium text-slate-700">{s.funding || "—"}</span>
+                        </div>
+                      </div>
+                      <Link
+                        href={`/scholarships/${s._id}`}
+                        className="block text-center bg-amber-600 hover:bg-amber-500 text-white py-2 rounded-xl text-xs font-semibold transition-colors"
+                      >
+                        View Details
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
       </main>
     </>

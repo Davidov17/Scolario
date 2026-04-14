@@ -6,6 +6,9 @@ export interface IUser extends Document {
   lastName: string;
   email: string;
   password: string;
+  isAdmin: boolean;
+  resetToken?: string;
+  resetTokenExpiry?: Date;
   comparePassword(candidate: string): Promise<boolean>;
 }
 
@@ -15,6 +18,9 @@ const UserSchema = new Schema<IUser>(
     lastName:  { type: String, required: true },
     email:     { type: String, required: true, unique: true, lowercase: true },
     password:  { type: String, required: true },
+    isAdmin:   { type: Boolean, default: false },
+    resetToken:       { type: String },
+    resetTokenExpiry: { type: Date },
   },
   { timestamps: true }
 );

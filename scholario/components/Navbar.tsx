@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const router = useRouter();
-  const [user, setUser] = useState<{ firstName: string; email: string } | null>(null);
+  const [user, setUser] = useState<{ firstName: string; email: string; isAdmin?: boolean } | null>(null);
   const [profileName, setProfileName] = useState<string | null>(null);
 
   useEffect(() => {
@@ -68,8 +68,16 @@ export default function Navbar() {
                 href="/user"
                 className="px-3 py-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors font-semibold"
               >
-                Hi, {profileName || user.firstName} 👋
+                Hi, {profileName || user.firstName}
               </Link>
+              {user.isAdmin && (
+                <Link
+                  href="/admin"
+                  className="px-3 py-2 text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50 rounded-lg transition-colors font-medium"
+                >
+                  Admin
+                </Link>
+              )}
               <button
                 onClick={handleLogout}
                 className="ml-1 px-4 py-2 text-sm text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"

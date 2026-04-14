@@ -4,37 +4,12 @@ import Link from "next/link";
 import Navbar from "../components/Navbar";
 import HeroCTA from "../components/HeroCTA";
 import FadeIn from "../components/FadeIn";
-
-const SHEET_ID = "1V71nSZuWQ6C-cJeEiu7yROCXZeEExwAcbqe9NUANaIU";
-
-async function getScholarships() {
-  try {
-    const res = await fetch(
-      `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`,
-      { cache: "no-store" }
-    );
-    const text = await res.text();
-    const json = JSON.parse(text.substring(47).slice(0, -2));
-    const rows = json.table.rows || [];
-    return rows
-      .map((row: any) => ({
-        title: row.c?.[0]?.v || "",
-        country: row.c?.[1]?.v || "",
-        degree: row.c?.[2]?.v || "",
-        funding: row.c?.[3]?.v || "",
-        deadline: row.c?.[4]?.v || "",
-        link: row.c?.[5]?.v || "",
-      }))
-      .filter((item: any) => item.title)
-      .map((item: any, index: number) => ({ ...item, id: index + 1 }));
-  } catch {
-    return [];
-  }
-}
+import { getScholarships } from "../lib/api";
 
 export default async function Home() {
   const scholarships = await getScholarships();
-  const featuredScholarships = scholarships.slice(0, 3);
+  const featuredScholarships = scholarships.filter((s) => s.isFeatured).slice(0, 3);
+  const displayScholarships = featuredScholarships.length > 0 ? featuredScholarships : scholarships.slice(0, 3);
 
   return (
     <>
@@ -129,13 +104,13 @@ export default async function Home() {
             </FadeIn>
 
             <div className="grid md:grid-cols-3 gap-6">
-              {featuredScholarships.length > 0 ? (
-                featuredScholarships.map((s: any, i: number) => (
-                  <FadeIn key={s.id} delay={i * 120} direction="up">
+              {displayScholarships.length > 0 ? (
+                displayScholarships.map((s, i) => (
+                  <FadeIn key={s._id} delay={i * 120} direction="up">
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1 hover:border-indigo-100 transition-all flex flex-col h-full">
                       <div className="flex items-center justify-between mb-4">
                         <span className="px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-semibold">
-                          {s.degree || "Scholarship"}
+                          {s.degreeLevel || "Scholarship"}
                         </span>
                         <span className="text-xs text-slate-400 font-medium">{s.country || "—"}</span>
                       </div>
@@ -151,7 +126,7 @@ export default async function Home() {
                         </div>
                       </div>
                       <Link
-                        href={`/scholarships/${s.id}`}
+                        href={`/scholarships/${s._id}`}
                         className="block text-center bg-slate-900 hover:bg-indigo-600 text-white py-2.5 rounded-xl text-sm font-medium transition-colors"
                       >
                         View Details
@@ -161,7 +136,7 @@ export default async function Home() {
                 ))
               ) : (
                 <p className="text-slate-400 col-span-full text-center py-8">
-                  No scholarships found. Check your Google Sheet sharing settings.
+                  No scholarships found. Add some via the admin panel.
                 </p>
               )}
             </div>
