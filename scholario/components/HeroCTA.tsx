@@ -13,16 +13,16 @@ export default function HeroCTA() {
 
   if (user) {
     return (
-      <div className="flex justify-center gap-4 flex-wrap">
+      <div className="flex justify-center gap-3 flex-wrap">
         <Link
           href="/user"
-          className="bg-white text-indigo-600 px-6 py-3 rounded-xl font-medium shadow-lg hover:scale-105 transition"
+          className="bg-white text-slate-900 px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
         >
           Go to My Dashboard →
         </Link>
         <Link
           href="/scholarships"
-          className="border border-white px-6 py-3 rounded-xl hover:bg-white hover:text-black transition"
+          className="border border-white/30 text-white px-6 py-3 rounded-xl hover:bg-white/10 transition-colors"
         >
           Browse Scholarships
         </Link>
@@ -31,16 +31,16 @@ export default function HeroCTA() {
   }
 
   return (
-    <div className="flex justify-center gap-4 flex-wrap">
+    <div className="flex justify-center gap-3 flex-wrap">
       <Link
         href="/signup"
-        className="bg-white text-black px-6 py-3 rounded-xl font-medium shadow-lg hover:scale-105 transition"
+        className="bg-white text-slate-900 px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
       >
-        Get Started
+        Get Started Free
       </Link>
       <Link
         href="/scholarships"
-        className="border border-white px-6 py-3 rounded-xl hover:bg-white hover:text-black transition"
+        className="border border-white/30 text-white px-6 py-3 rounded-xl hover:bg-white/10 transition-colors"
       >
         Browse Scholarships
       </Link>

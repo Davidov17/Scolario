@@ -15,13 +15,13 @@ router.post("/signup", async (req: Request, res: Response) => {
       return;
     }
 
-    const existing = await User.findOne({ email });
+    const existing = await User.findOne({ email: email.toLowerCase().trim() });
     if (existing) {
       res.status(400).json({ error: "An account with this email already exists." });
       return;
     }
 
-    const user = new User({ firstName, lastName, email, password });
+    const user = new User({ firstName, lastName, email: email.toLowerCase().trim(), password });
     await user.save();
 
     const token = jwt.sign(
@@ -49,13 +49,13 @@ router.post("/login", async (req: Request, res: Response) => {
       return;
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
     if (!user) {
       res.status(401).json({ error: "Invalid email or password." });
       return;
     }
 
-    const valid = await user.comparePassword(password);
+    const valid = await user.comparePassword(password.trim());
     if (!valid) {
       res.status(401).json({ error: "Invalid email or password." });
       return;

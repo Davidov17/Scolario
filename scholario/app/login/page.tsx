@@ -41,34 +41,38 @@ export default function LoginPage() {
     }
   }
 
+  const inputClass = "w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder:text-slate-400";
+
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-gray-100 px-6 py-16">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 items-center">
+      <main className="min-h-screen bg-slate-50 flex items-stretch">
 
-          {/* LEFT */}
-          <div>
-            <span className="inline-block px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 text-sm font-medium mb-4">
-              Welcome Back
+        {/* Left photo panel */}
+        <div className="hidden md:block md:w-1/2 relative">
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: "url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80')" }}
+          />
+          <div className="absolute inset-0 bg-slate-900/65" />
+          <div className="relative h-full flex flex-col justify-end p-12">
+            <span className="inline-block px-3 py-1 rounded-full bg-white/15 border border-white/25 text-white text-xs font-semibold uppercase tracking-widest mb-5">
+              Welcome back
             </span>
-            <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
-              Log in to continue your scholarship journey.
-            </h1>
-            <p className="text-gray-600 text-lg mb-6">
+            <h2 className="text-3xl font-bold text-white leading-tight mb-3">
+              Your scholarship journey continues here.
+            </h2>
+            <p className="text-slate-300 text-sm leading-relaxed">
               Access your personalized matches, saved scholarships, and deadlines all in one place.
             </p>
-            <div className="space-y-4 text-gray-700">
-              <div className="bg-white rounded-2xl p-4 shadow-sm border">Personalized scholarship matches</div>
-              <div className="bg-white rounded-2xl p-4 shadow-sm border">Track deadlines and requirements</div>
-              <div className="bg-white rounded-2xl p-4 shadow-sm border">Your student dashboard</div>
-            </div>
           </div>
+        </div>
 
-          {/* RIGHT */}
-          <div className="w-full bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-xl border border-gray-100">
-            <h2 className="text-3xl font-bold mb-2 text-center">Log In</h2>
-            <p className="text-gray-500 text-center mb-6">Enter your credentials to continue</p>
+        {/* Right form panel */}
+        <div className="w-full md:w-1/2 flex items-center justify-center px-8 py-16">
+          <div className="w-full max-w-md">
+            <h2 className="text-2xl font-bold text-slate-900 mb-1">Log In</h2>
+            <p className="text-slate-400 text-sm mb-8">Enter your credentials to continue</p>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
               <input
@@ -77,7 +81,7 @@ export default function LoginPage() {
                 placeholder="Email Address"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500"
+                className={inputClass}
               />
 
               <div className="relative">
@@ -87,12 +91,12 @@ export default function LoginPage() {
                   placeholder="Password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500"
+                  className={inputClass}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-indigo-600"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-indigo-600 hover:text-indigo-800"
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
@@ -106,20 +110,21 @@ export default function LoginPage() {
 
               <button
                 type="submit"
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl shadow-md hover:shadow-lg transition"
+                className="w-full bg-slate-900 hover:bg-slate-700 text-white py-3 rounded-xl font-semibold text-sm transition-colors shadow-sm"
               >
                 Log In
               </button>
             </form>
 
-            <p className="text-sm text-gray-500 text-center mt-6">
-              Don't have an account?{" "}
-              <Link href="/signup" className="text-indigo-600 hover:underline">
-                Sign up
+            <p className="text-sm text-slate-400 text-center mt-6">
+              Don&apos;t have an account?{" "}
+              <Link href="/signup" className="text-indigo-600 hover:text-indigo-800 font-semibold">
+                Sign up free
               </Link>
             </p>
           </div>
         </div>
+
       </main>
     </>
   );
