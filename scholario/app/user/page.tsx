@@ -213,7 +213,7 @@ export default function UserPage() {
           <div className="grid md:grid-cols-2 gap-5 mb-10">
             <Link
               href="/scholarships"
-              className="group bg-slate-900 hover:bg-slate-800 text-white rounded-2xl p-6 shadow-sm transition-colors"
+              className="group bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl p-6 shadow-sm transition-colors"
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -272,7 +272,7 @@ export default function UserPage() {
                   <p className="text-slate-400 mb-5">No matches found yet.</p>
                   <Link
                     href="/profile"
-                    className="inline-block bg-slate-900 hover:bg-slate-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-colors"
+                    className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-colors"
                   >
                     Update your profile →
                   </Link>
@@ -326,7 +326,7 @@ export default function UserPage() {
                       )}
                       <Link
                         href={`/scholarships/${s._id}`}
-                        className="block text-center bg-slate-900 hover:bg-slate-700 text-white py-2 rounded-xl text-xs font-semibold transition-colors"
+                        className="block text-center bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl text-xs font-semibold transition-colors"
                       >
                         View Details
                       </Link>
@@ -462,9 +462,9 @@ export default function UserPage() {
               <div className="p-6">
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {bookmarks.map((s) => (
-                    <div key={s._id} className="border border-amber-200 bg-amber-50/30 rounded-2xl p-5 flex flex-col hover:shadow-md transition-all">
+                    <div key={s._id} className="border border-slate-200 bg-white rounded-2xl p-5 flex flex-col hover:shadow-md transition-all">
                       <div className="flex items-start justify-between mb-3">
-                        <span className="inline-block px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold">
+                        <span className="inline-block px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-semibold">
                           {s.degreeLevel || "Scholarship"}
                         </span>
                       </div>
@@ -485,7 +485,7 @@ export default function UserPage() {
                       </div>
                       <Link
                         href={`/scholarships/${s._id}`}
-                        className="block text-center bg-amber-600 hover:bg-amber-500 text-white py-2 rounded-xl text-xs font-semibold transition-colors"
+                        className="block text-center bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl text-xs font-semibold transition-colors"
                       >
                         View Details
                       </Link>

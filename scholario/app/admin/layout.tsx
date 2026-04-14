@@ -53,19 +53,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 flex">
+    <div className="min-h-screen bg-slate-50 flex">
 
       {/* ── Sidebar ──────────────────────────────────────────── */}
-      <aside className="w-60 shrink-0 bg-slate-900 border-r border-white/5 flex flex-col">
+      <aside className="w-60 shrink-0 bg-white border-r border-slate-200 flex flex-col">
         {/* Logo */}
-        <div className="px-6 py-5 border-b border-white/5">
+        <div className="px-6 py-5 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 bg-indigo-500 rounded-lg flex items-center justify-center shrink-0">
+            <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center shrink-0">
               <span className="text-white font-bold text-xs">S</span>
             </div>
             <div>
-              <span className="text-white font-bold text-sm tracking-tight">Scholario</span>
-              <span className="block text-[10px] text-indigo-400 font-semibold uppercase tracking-widest leading-none mt-0.5">Admin</span>
+              <span className="text-slate-900 font-bold text-sm tracking-tight">Scholario</span>
+              <span className="block text-[10px] text-indigo-600 font-semibold uppercase tracking-widest leading-none mt-0.5">Admin</span>
             </div>
           </div>
         </div>
@@ -80,8 +80,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 href={item.href}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   active
-                    ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/20"
-                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                    ? "bg-indigo-50 text-indigo-700 border border-indigo-100"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                 }`}
               >
                 {item.icon}
@@ -92,21 +92,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </nav>
 
         {/* Admin info + logout */}
-        <div className="px-4 py-4 border-t border-white/5">
+        <div className="px-4 py-4 border-t border-slate-200">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center shrink-0">
-              <span className="text-indigo-300 text-xs font-bold">
+            <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-200 flex items-center justify-center shrink-0">
+              <span className="text-indigo-600 text-xs font-bold">
                 {admin.firstName[0].toUpperCase()}
               </span>
             </div>
             <div className="min-w-0">
-              <p className="text-white text-xs font-semibold truncate">{admin.firstName}</p>
+              <p className="text-slate-900 text-xs font-semibold truncate">{admin.firstName}</p>
               <p className="text-slate-500 text-[10px] truncate">{admin.email}</p>
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-slate-400 hover:text-red-400 hover:bg-red-500/10 text-xs font-medium transition-all"
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-slate-500 hover:text-red-600 hover:bg-red-50 text-xs font-medium transition-all"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
@@ -119,13 +119,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* ── Main content ─────────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
-        <header className="h-14 border-b border-white/5 bg-slate-900/50 flex items-center px-6 gap-4 shrink-0">
+        <header className="h-14 border-b border-slate-200 bg-white flex items-center px-6 gap-4 shrink-0">
           <div className="flex-1" />
           <a
             href="/"
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-300 transition-colors"
+            className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 transition-colors"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -134,7 +134,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </a>
         </header>
 
-        <main className="flex-1 overflow-auto bg-slate-950">
+        <main className="flex-1 overflow-auto bg-slate-50">
           {children}
         </main>
       </div>

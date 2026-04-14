@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+const inputClass = "w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600";
 
 interface User {
   _id: string;
@@ -71,8 +72,8 @@ export default function AdminUsersPage() {
       {/* Page header */}
       <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Users</h1>
-          <p className="text-slate-400 text-sm mt-0.5">
+          <h1 className="text-2xl font-bold text-slate-900">Users</h1>
+          <p className="text-slate-600 text-sm mt-0.5">
             {users.length} total &mdash; {admins} admin{admins !== 1 ? "s" : ""}, {students} student{students !== 1 ? "s" : ""}
           </p>
         </div>
@@ -88,43 +89,43 @@ export default function AdminUsersPage() {
           placeholder="Search by name or email…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-white placeholder:text-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600"
         />
       </div>
 
       {/* Table */}
-      <div className="bg-slate-900 border border-white/10 rounded-2xl overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
         {loading ? (
           <div className="text-center py-16">
-            <div className="inline-block w-6 h-6 border-[3px] border-white/10 border-t-indigo-500 rounded-full animate-spin" />
+            <div className="inline-block w-6 h-6 border-[3px] border-slate-200 border-t-indigo-600 rounded-full animate-spin" />
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-16 text-slate-500">No users found.</div>
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/5">
+              <tr className="border-b border-slate-200 bg-slate-50">
                 {["Name", "Email", "Role", "Joined", ""].map((h) => (
-                  <th key={h} className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">{h}</th>
+                  <th key={h} className="text-left px-5 py-3 text-xs font-semibold text-slate-600 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-slate-100">
               {filtered.map((u) => (
-                <tr key={u._id} className="hover:bg-white/5 transition-colors">
+                <tr key={u._id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-5 py-3.5">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center shrink-0">
-                        <span className="text-indigo-300 text-xs font-bold">{u.firstName[0].toUpperCase()}</span>
+                      <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-200 flex items-center justify-center shrink-0">
+                        <span className="text-indigo-600 text-xs font-bold">{u.firstName[0].toUpperCase()}</span>
                       </div>
-                      <span className="font-medium text-white">{u.firstName} {u.lastName}</span>
+                      <span className="font-medium text-slate-900">{u.firstName} {u.lastName}</span>
                     </div>
                   </td>
-                  <td className="px-5 py-3.5 text-slate-400">{u.email}</td>
+                  <td className="px-5 py-3.5 text-slate-600">{u.email}</td>
                   <td className="px-5 py-3.5">
                     {u.isAdmin
-                      ? <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/15 text-indigo-400">Admin</span>
-                      : <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-700/60 text-slate-400">Student</span>}
+                      ? <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700">Admin</span>
+                      : <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">Student</span>}
                   </td>
                   <td className="px-5 py-3.5 text-slate-500 text-xs">
                     {new Date(u.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
@@ -134,13 +135,13 @@ export default function AdminUsersPage() {
                       <button
                         onClick={() => handleToggleAdmin(u._id)}
                         disabled={togglingId === u._id}
-                        className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 disabled:opacity-50 transition-colors"
+                        className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 disabled:opacity-50 transition-colors"
                       >
                         {togglingId === u._id ? "…" : u.isAdmin ? "Demote" : "Make Admin"}
                       </button>
                       <button
                         onClick={() => setDeleteId(u._id)}
-                        className="text-xs font-semibold text-red-500 hover:text-red-400 transition-colors"
+                        className="text-xs font-semibold text-red-500 hover:text-red-700 transition-colors"
                       >
                         Delete
                       </button>
@@ -155,18 +156,18 @@ export default function AdminUsersPage() {
 
       {/* Delete modal */}
       {deleteId && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4">
-          <div className="bg-slate-900 border border-white/10 rounded-2xl p-8 max-w-sm w-full shadow-2xl">
-            <h3 className="text-lg font-bold text-white mb-2">Delete user?</h3>
-            <p className="text-slate-400 text-sm mb-1">
-              <span className="font-semibold text-white">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+          <div className="bg-white border border-slate-200 rounded-2xl p-8 max-w-sm w-full shadow-xl">
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Delete user?</h3>
+            <p className="text-slate-600 text-sm mb-1">
+              <span className="font-semibold text-slate-900">
                 {users.find((u) => u._id === deleteId)?.firstName} {users.find((u) => u._id === deleteId)?.lastName}
               </span>
             </p>
-            <p className="text-slate-400 text-sm mb-6">This will permanently remove their account and cannot be undone.</p>
+            <p className="text-slate-600 text-sm mb-6">This will permanently remove their account and cannot be undone.</p>
             <div className="flex gap-3">
               <button onClick={() => handleDelete(deleteId)} className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2.5 rounded-xl text-sm font-semibold transition-colors">Delete</button>
-              <button onClick={() => setDeleteId(null)} className="flex-1 bg-white/5 hover:bg-white/10 text-slate-300 py-2.5 rounded-xl text-sm font-semibold transition-colors">Cancel</button>
+              <button onClick={() => setDeleteId(null)} className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl text-sm font-semibold transition-colors">Cancel</button>
             </div>
           </div>
         </div>

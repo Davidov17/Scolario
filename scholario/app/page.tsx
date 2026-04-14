@@ -127,7 +127,7 @@ export default async function Home() {
                       </div>
                       <Link
                         href={`/scholarships/${s._id}`}
-                        className="block text-center bg-slate-900 hover:bg-indigo-600 text-white py-2.5 rounded-xl text-sm font-medium transition-colors"
+                        className="block text-center bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-sm font-medium transition-colors"
                       >
                         View Details
                       </Link>

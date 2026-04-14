@@ -128,7 +128,7 @@ export default function SignupPage() {
         <div className="w-full md:w-1/2 flex items-center justify-center px-8 py-12">
           <div className="w-full max-w-md">
             <h2 className="text-2xl font-bold text-slate-900 mb-1">Create Account</h2>
-            <p className="text-slate-400 text-sm mb-8">Start your scholarship journey today</p>
+            <p className="text-slate-600 text-sm mb-8">Start your scholarship journey today</p>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
 
@@ -152,7 +152,7 @@ export default function SignupPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword((p) => !p)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-indigo-600 hover:text-indigo-800"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400 hover:text-slate-600"
                   >
                     {showPassword ? "Hide" : "Show"}
                   </button>
@@ -172,7 +172,7 @@ export default function SignupPage() {
                         />
                       ))}
                     </div>
-                    <p className={`text-xs ${isStrongPassword(formData.password) ? "text-emerald-600" : "text-slate-400"}`}>
+                    <p className={`text-xs ${isStrongPassword(formData.password) ? "text-emerald-600" : "text-slate-500"}`}>
                       {isStrongPassword(formData.password) ? "Strong password" : "Use 8+ chars with uppercase, lowercase, number & symbol"}
                     </p>
                   </div>
@@ -191,7 +191,7 @@ export default function SignupPage() {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword((p) => !p)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-indigo-600 hover:text-indigo-800"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400 hover:text-slate-600"
                 >
                   {showConfirmPassword ? "Hide" : "Show"}
                 </button>
@@ -217,15 +217,15 @@ export default function SignupPage() {
 
               <button
                 type="submit"
-                className="w-full bg-slate-900 hover:bg-slate-700 text-white py-3 rounded-xl font-semibold text-sm transition-colors shadow-sm"
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold text-sm transition-colors shadow-sm"
               >
                 Create Account
               </button>
             </form>
 
-            <p className="text-sm text-slate-400 text-center mt-6">
+            <p className="text-sm text-slate-600 text-center mt-6">
               Already have an account?{" "}
-              <Link href="/login" className="text-indigo-600 hover:text-indigo-800 font-semibold">
+              <Link href="/login" className="text-blue-500 hover:text-blue-700 font-semibold">
                 Log in
               </Link>
             </p>

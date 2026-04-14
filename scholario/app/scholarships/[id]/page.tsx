@@ -167,7 +167,7 @@ export default function Page() {
             <p className="text-slate-500 mb-8">This scholarship may have been removed or the link is incorrect.</p>
             <Link
               href="/scholarships"
-              className="inline-block bg-slate-900 hover:bg-slate-700 text-white px-6 py-3 rounded-xl font-medium transition-colors"
+              className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-medium transition-colors"
             >
               ← Back to Scholarships
             </Link>

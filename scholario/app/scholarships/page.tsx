@@ -31,7 +31,7 @@ function ScholarshipCard({ s }: { s: Scholarship }) {
 
       <Link
         href={`/scholarships/${s._id}`}
-        className="block w-full bg-slate-900 hover:bg-slate-700 text-white py-2.5 rounded-xl text-center text-sm font-medium transition-colors"
+        className="block w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-center text-sm font-medium transition-colors"
       >
         View Details
       </Link>
@@ -236,13 +236,13 @@ export default function ScholarshipsPage() {
               <ScholarshipSection
                 title="Master's Scholarships"
                 tag="Postgraduate"
-                tagColor="bg-violet-50 text-violet-700"
+                tagColor="bg-blue-50 text-blue-600"
                 scholarships={masters}
               />
               <ScholarshipSection
                 title="Other Scholarships"
                 tag="Other"
-                tagColor="bg-amber-50 text-amber-700"
+                tagColor="bg-slate-100 text-slate-600"
                 scholarships={others}
               />
             </>

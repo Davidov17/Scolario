@@ -47,7 +47,7 @@ export default function Navbar() {
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-sm tracking-tight">S</span>
           </div>
           <span className="text-lg font-bold text-slate-900 tracking-tight">Scholario</span>
@@ -55,10 +55,10 @@ export default function Navbar() {
 
         {/* Nav */}
         <div className="flex items-center gap-1 text-sm font-medium">
-          <Link href="/" className="px-3 py-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
+          <Link href="/" className="px-3 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
             Home
           </Link>
-          <Link href="/scholarships" className="px-3 py-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
+          <Link href="/scholarships" className="px-3 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
             Scholarships
           </Link>
 
@@ -87,12 +87,12 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link href="/signup" className="px-3 py-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
+              <Link href="/signup" className="px-3 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
                 Sign Up
               </Link>
               <Link
                 href="/login"
-                className="ml-1 px-4 py-2 bg-slate-900 hover:bg-slate-700 text-white rounded-lg transition-colors text-sm font-medium"
+                className="ml-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors text-sm font-medium"
               >
                 Log In
               </Link>
