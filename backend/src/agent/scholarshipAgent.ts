@@ -1,4 +1,4 @@
-import * as cheerio from "cheerio";
+import { load } from "cheerio";
 import { Scholarship } from "../models/Scholarship";
 import { fetchPageHtml } from "./scraper";
 
@@ -103,7 +103,7 @@ function isExpired(deadlineStr: string): boolean {
 
 async function scrapeDetailPage(url: string): Promise<RawScholarship | null> {
   const html = await fetchPageHtml(url);
-  const $ = cheerio.load(html);
+  const $ = load(html);
 
   // ── Title ──
   const title = $("h1").first().text().trim();
@@ -188,7 +188,7 @@ async function scrapeDetailPage(url: string): Promise<RawScholarship | null> {
 
 async function getArticleLinks(listingUrl: string, selector: string): Promise<string[]> {
   const html = await fetchPageHtml(listingUrl);
-  const $ = cheerio.load(html);
+  const $ = load(html);
   const links = new Set<string>();
 
   $(selector).each((_, el) => {
