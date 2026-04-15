@@ -8,14 +8,19 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "seed": "ts-node src/seed.ts",
-    "create-admin": "ts-node src/create-admin.ts"
+    "create-admin": "ts-node src/create-admin.ts",
+    "agent": "ts-node src/agent/runner.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.88.0",
     "@types/bcryptjs": "^2.4.6",
+    "@types/cheerio": "^0.22.35",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.1.0",
     "@types/nodemailer": "^8.0.0",
+    "axios": "^1.15.0",
     "bcryptjs": "^3.0.3",
+    "cheerio": "^1.2.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",

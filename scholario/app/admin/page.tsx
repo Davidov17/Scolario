@@ -62,14 +62,14 @@ function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: 
     <label className="flex items-center gap-3 cursor-pointer select-none">
       <div
         onClick={() => onChange(!checked)}
-        className={`relative w-10 h-5.5 rounded-full transition-colors shrink-0 ${checked ? "bg-indigo-500" : "bg-white/10"}`}
+        className={`relative rounded-full transition-colors shrink-0 ${checked ? "bg-indigo-500" : "bg-slate-300"}`}
         style={{ width: 40, height: 22 }}
       >
         <span
           className={`absolute top-[3px] w-4 h-4 rounded-full bg-white shadow transition-all ${checked ? "left-[22px]" : "left-[3px]"}`}
         />
       </div>
-      <span className="text-sm font-medium text-slate-300">{label}</span>
+      <span className="text-sm font-medium text-slate-700">{label}</span>
     </label>
   );
 }
@@ -167,7 +167,7 @@ function RequirementsEditor({ value, onChange }: { value: Requirements; onChange
                     className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all ${
                       active
                         ? "bg-indigo-500 border-indigo-400 text-white"
-                        : "border-white/15 text-slate-400 hover:border-white/30 hover:text-slate-300"
+                        : "border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700"
                     }`}
                   >
                     {level}
@@ -243,7 +243,7 @@ function RequirementsEditor({ value, onChange }: { value: Requirements; onChange
                     className={`w-9 h-9 rounded-lg text-sm font-bold border transition-all ${
                       value.recommendationLetters.count === n
                         ? "bg-indigo-500 border-indigo-400 text-white"
-                        : "border-white/15 text-slate-400 hover:border-white/30"
+                        : "border-slate-200 text-slate-500 hover:border-slate-300"
                     }`}
                   >
                     {n}
@@ -426,7 +426,7 @@ export default function AdminScholarshipsPage() {
 
             <div className="flex items-center gap-2 md:col-span-2">
               <input type="checkbox" id="isFeatured" checked={form.isFeatured} onChange={(e) => setForm((p) => ({ ...p, isFeatured: e.target.checked }))} className="w-4 h-4 accent-indigo-500" />
-              <label htmlFor="isFeatured" className="text-sm font-medium text-slate-300">Featured on homepage</label>
+              <label htmlFor="isFeatured" className="text-sm font-medium text-slate-700">Featured on homepage</label>
             </div>
 
             {/* Divider */}

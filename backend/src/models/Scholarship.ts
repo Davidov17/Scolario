@@ -27,7 +27,7 @@ export interface IScholarship extends Document {
   requirements: IRequirements;
   link: string;
   isFeatured: boolean;
-  source: "manual" | "spreadsheet";
+  source: "manual" | "spreadsheet" | "agent";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -74,7 +74,7 @@ const ScholarshipSchema = new Schema<IScholarship>(
     isFeatured: { type: Boolean, default: false },
     source: {
       type: String,
-      enum: ["manual", "spreadsheet"],
+      enum: ["manual", "spreadsheet", "agent"],
       default: "manual",
     },
   },

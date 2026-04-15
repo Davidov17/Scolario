@@ -9,6 +9,7 @@ import bookmarkRoutes from "./routes/bookmarks";
 import applicationRoutes from "./routes/applications";
 import notificationRoutes from "./routes/notifications";
 import userRoutes from "./routes/users";
+import agentRoutes from "./routes/agent";
 
 dotenv.config();
 
@@ -21,7 +22,7 @@ const MONGODB_URI =
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || "http://localhost:3000",
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   })
 );
 app.use(express.json());
@@ -34,6 +35,7 @@ app.use("/api/bookmarks", bookmarkRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/agent", agentRoutes);
 
 app.get("/", (_req, res) => {
   res.json({ status: "Scolario API is running" });
