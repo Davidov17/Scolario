@@ -12,9 +12,7 @@
     "agent": "ts-node src/agent/runner.ts"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.88.0",
     "@types/bcryptjs": "^2.4.6",
-    "@types/cheerio": "^0.22.35",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.1.0",
     "@types/nodemailer": "^8.0.0",
