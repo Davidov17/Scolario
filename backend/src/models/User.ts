@@ -7,6 +7,9 @@ export interface IUser extends Document {
   email: string;
   password: string;
   isAdmin: boolean;
+  isVerified: boolean;
+  verificationCode?: string;
+  verificationCodeExpiry?: Date;
   resetToken?: string;
   resetTokenExpiry?: Date;
   comparePassword(candidate: string): Promise<boolean>;
@@ -19,6 +22,10 @@ const UserSchema = new Schema<IUser>(
     email:     { type: String, required: true, unique: true, lowercase: true },
     password:  { type: String, required: true },
     isAdmin:   { type: Boolean, default: false },
+    // true for all existing users; set to false on new signups until email verified
+    isVerified: { type: Boolean, default: true },
+    verificationCode:       { type: String },
+    verificationCodeExpiry: { type: Date },
     resetToken:       { type: String },
     resetTokenExpiry: { type: Date },
   },

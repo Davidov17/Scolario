@@ -40,7 +40,15 @@ export default function LoginPage() {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
-      if (!res.ok) { setError(data.error || "Login failed."); return; }
+      if (!res.ok) {
+        // Unverified account — redirect to signup verification step
+        if (data.needsVerification) {
+          router.push(`/signup?verify=1&email=${encodeURIComponent(data.email || formData.email)}`);
+          return;
+        }
+        setError(data.error || "Login failed.");
+        return;
+      }
       if (data.user.isAdmin) {
         setError("Admin accounts must sign in through the admin portal.");
         return;
