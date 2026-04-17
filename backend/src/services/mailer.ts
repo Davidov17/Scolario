@@ -1,7 +1,18 @@
-import { Resend } from "resend";
+import * as Brevo from "@getbrevo/brevo";
 import nodemailer from "nodemailer";
 
-let resend: Resend | null = null;
+let brevoClient: Brevo.TransactionalEmailsApi | null = null;
+
+function getBrevoClient(): Brevo.TransactionalEmailsApi {
+  if (brevoClient) return brevoClient;
+  brevoClient = new Brevo.TransactionalEmailsApi();
+  brevoClient.setApiKey(
+    Brevo.TransactionalEmailsApiApiKeys.apiKey,
+    process.env.BREVO_API_KEY!
+  );
+  return brevoClient;
+}
+
 let etherealTransporter: nodemailer.Transporter | null = null;
 
 async function getEtherealTransporter(): Promise<nodemailer.Transporter> {
@@ -50,12 +61,15 @@ export async function sendVerificationCode(
     </div>
   `;
 
-  if (process.env.RESEND_API_KEY) {
-    if (!resend) resend = new Resend(process.env.RESEND_API_KEY);
-    // RESEND_FROM must be a verified domain; free tier default is onboarding@resend.dev
-    const from = process.env.RESEND_FROM || "Scholario <onboarding@resend.dev>";
-    const result = await resend.emails.send({ from, to, subject, html });
-    console.log("📧 Resend result:", JSON.stringify(result));
+  if (process.env.BREVO_API_KEY) {
+    const client = getBrevoClient();
+    const sendSmtpEmail = new Brevo.SendSmtpEmail();
+    sendSmtpEmail.subject = subject;
+    sendSmtpEmail.htmlContent = html;
+    sendSmtpEmail.sender = { name: "Scholario", email: "scholario.admin@gmail.com" };
+    sendSmtpEmail.to = [{ email: to }];
+    const result = await client.sendTransacEmail(sendSmtpEmail);
+    console.log("📧 Brevo result:", JSON.stringify(result.body));
     return;
   }
 
@@ -97,14 +111,16 @@ export async function sendDeadlineReminder(
     </div>
   `;
 
-  if (process.env.RESEND_API_KEY) {
-    if (!resend) resend = new Resend(process.env.RESEND_API_KEY);
-    await resend.emails.send({
-      from: process.env.SMTP_FROM || "Scholario <no-reply@scholario.app>",
-      to,
-      subject: `Scholarship Deadline Reminder — ${scholarships.length} upcoming deadline${scholarships.length > 1 ? "s" : ""}`,
-      html,
-    });
+  const subject = `Scholarship Deadline Reminder — ${scholarships.length} upcoming deadline${scholarships.length > 1 ? "s" : ""}`;
+
+  if (process.env.BREVO_API_KEY) {
+    const client = getBrevoClient();
+    const sendSmtpEmail = new Brevo.SendSmtpEmail();
+    sendSmtpEmail.subject = subject;
+    sendSmtpEmail.htmlContent = html;
+    sendSmtpEmail.sender = { name: "Scholario", email: "scholario.admin@gmail.com" };
+    sendSmtpEmail.to = [{ email: to }];
+    await client.sendTransacEmail(sendSmtpEmail);
     return null;
   }
 
@@ -112,7 +128,7 @@ export async function sendDeadlineReminder(
   const info = await t.sendMail({
     from: '"Scholario" <no-reply@scholario.app>',
     to,
-    subject: `Scholarship Deadline Reminder — ${scholarships.length} upcoming deadline${scholarships.length > 1 ? "s" : ""}`,
+    subject,
     html,
   });
   const previewUrl = nodemailer.getTestMessageUrl(info);
