@@ -52,12 +52,10 @@ export async function sendVerificationCode(
 
   if (process.env.RESEND_API_KEY) {
     if (!resend) resend = new Resend(process.env.RESEND_API_KEY);
-    await resend.emails.send({
-      from: process.env.SMTP_FROM || "Scholario <no-reply@scholario.app>",
-      to,
-      subject,
-      html,
-    });
+    // RESEND_FROM must be a verified domain; free tier default is onboarding@resend.dev
+    const from = process.env.RESEND_FROM || "Scholario <onboarding@resend.dev>";
+    const result = await resend.emails.send({ from, to, subject, html });
+    console.log("📧 Resend result:", JSON.stringify(result));
     return;
   }
 
