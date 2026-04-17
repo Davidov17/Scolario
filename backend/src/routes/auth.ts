@@ -24,12 +24,13 @@ router.post("/signup", async (req: Request, res: Response) => {
     const existing = await User.findOne({ email: email.toLowerCase().trim() });
     if (existing) {
       if (!existing.isVerified) {
-        // Resend a fresh code for incomplete signups
         const code = generateCode();
         existing.verificationCode = code;
         existing.verificationCodeExpiry = new Date(Date.now() + 1000 * 60 * 60);
         await existing.save();
-        await sendVerificationCode(existing.email, code, "signup");
+        sendVerificationCode(existing.email, code, "signup").catch((e) =>
+          console.error("Email send failed:", e)
+        );
         res.status(200).json({ needsVerification: true, email: existing.email });
         return;
       }
@@ -49,7 +50,10 @@ router.post("/signup", async (req: Request, res: Response) => {
     });
     await user.save();
 
-    await sendVerificationCode(user.email, code, "signup");
+    // Don't await — email failure should not block the signup response
+    sendVerificationCode(user.email, code, "signup").catch((e) =>
+      console.error("Email send failed:", e)
+    );
 
     res.status(201).json({ needsVerification: true, email: user.email });
   } catch (err) {
@@ -126,7 +130,9 @@ router.post("/resend-code", async (req: Request, res: Response) => {
     user.verificationCodeExpiry = new Date(Date.now() + 1000 * 60 * 60);
     await user.save();
 
-    await sendVerificationCode(user.email, code, "signup");
+    sendVerificationCode(user.email, code, "signup").catch((e) =>
+      console.error("Email send failed:", e)
+    );
     res.json({ message: "A new verification code has been sent to your email." });
   } catch (err) {
     console.error("Resend code error:", err);
@@ -208,7 +214,9 @@ router.post("/forgot-password", async (req: Request, res: Response) => {
     user.resetTokenExpiry = new Date(Date.now() + 1000 * 60 * 60);
     await user.save();
 
-    await sendVerificationCode(user.email, code, "reset");
+    sendVerificationCode(user.email, code, "reset").catch((e) =>
+      console.error("Email send failed:", e)
+    );
 
     res.json({ message: "A password reset code has been sent to your email." });
   } catch (err) {
