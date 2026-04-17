@@ -17,7 +17,8 @@ async function getTransporter(): Promise<nodemailer.Transporter> {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
-    });
+      family: 4, // force IPv4 — Railway doesn't route IPv6 outbound
+    } as Parameters<typeof nodemailer.createTransport>[0]);
   } else {
     // Create a test account on Ethereal for development
     const testAccount = await nodemailer.createTestAccount();
