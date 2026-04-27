@@ -1,6 +1,9 @@
 import * as Brevo from "@getbrevo/brevo";
 import nodemailer from "nodemailer";
 
+const BREVO_FROM_EMAIL = process.env.BREVO_FROM_EMAIL || "scholario.admin@gmail.com";
+const BREVO_FROM_NAME = "Scholario";
+
 let brevoClient: Brevo.TransactionalEmailsApi | null = null;
 
 function getBrevoClient(): Brevo.TransactionalEmailsApi {
@@ -66,7 +69,7 @@ export async function sendVerificationCode(
     const sendSmtpEmail = new Brevo.SendSmtpEmail();
     sendSmtpEmail.subject = subject;
     sendSmtpEmail.htmlContent = html;
-    sendSmtpEmail.sender = { name: "Scholario", email: "scholario.admin@gmail.com" };
+    sendSmtpEmail.sender = { name: BREVO_FROM_NAME, email: BREVO_FROM_EMAIL };
     sendSmtpEmail.to = [{ email: to }];
     const result = await client.sendTransacEmail(sendSmtpEmail);
     console.log("📧 Brevo result:", JSON.stringify(result.body));
@@ -79,6 +82,46 @@ export async function sendVerificationCode(
     from: '"Scholario" <no-reply@scholario.app>',
     to,
     subject,
+    html,
+  });
+  const previewUrl = nodemailer.getTestMessageUrl(info);
+  if (previewUrl) console.log("📧 Email preview:", previewUrl);
+}
+
+export async function sendPasswordChangeConfirmation(
+  to: string,
+  firstName: string
+): Promise<void> {
+  const html = `
+    <div style="font-family:sans-serif;max-width:480px;margin:0 auto;color:#1e293b">
+      <div style="background:#4f46e5;padding:32px 32px 24px;border-radius:16px 16px 0 0;text-align:center">
+        <span style="color:#fff;font-size:22px;font-weight:700;letter-spacing:-0.5px">Scholario</span>
+      </div>
+      <div style="background:#fff;border:1px solid #e2e8f0;border-top:none;padding:32px;border-radius:0 0 16px 16px">
+        <h2 style="margin:0 0 8px;font-size:20px;font-weight:700">Password changed</h2>
+        <p style="color:#64748b;font-size:14px;margin:0 0 16px">Hi ${firstName}, your Scholario account password was just changed successfully.</p>
+        <p style="color:#64748b;font-size:14px;margin:0 0 24px">If you made this change, no action is needed. If you did <strong>not</strong> change your password, please reset it immediately via the Forgot Password link.</p>
+        <p style="color:#94a3b8;font-size:12px;margin:0">If you did not request this change, please secure your account immediately.</p>
+      </div>
+    </div>
+  `;
+
+  if (process.env.BREVO_API_KEY) {
+    const client = getBrevoClient();
+    const sendSmtpEmail = new Brevo.SendSmtpEmail();
+    sendSmtpEmail.subject = "Your Scholario password was changed";
+    sendSmtpEmail.htmlContent = html;
+    sendSmtpEmail.sender = { name: BREVO_FROM_NAME, email: BREVO_FROM_EMAIL };
+    sendSmtpEmail.to = [{ email: to }];
+    await client.sendTransacEmail(sendSmtpEmail);
+    return;
+  }
+
+  const t = await getEtherealTransporter();
+  const info = await t.sendMail({
+    from: '"Scholario" <no-reply@scholario.app>',
+    to,
+    subject: "Your Scholario password was changed",
     html,
   });
   const previewUrl = nodemailer.getTestMessageUrl(info);
@@ -118,7 +161,7 @@ export async function sendDeadlineReminder(
     const sendSmtpEmail = new Brevo.SendSmtpEmail();
     sendSmtpEmail.subject = subject;
     sendSmtpEmail.htmlContent = html;
-    sendSmtpEmail.sender = { name: "Scholario", email: "scholario.admin@gmail.com" };
+    sendSmtpEmail.sender = { name: BREVO_FROM_NAME, email: BREVO_FROM_EMAIL };
     sendSmtpEmail.to = [{ email: to }];
     await client.sendTransacEmail(sendSmtpEmail);
     return null;

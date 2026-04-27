@@ -92,4 +92,53 @@ router.post("/send-reminders", requireAuth, async (req: AuthRequest, res: Respon
   }
 });
 
+// POST /api/notifications/cron-reminders
+// Called by a scheduled job (e.g. Railway cron). Protected by CRON_SECRET header.
+router.post("/cron-reminders", async (req, res: Response) => {
+  const secret = process.env.CRON_SECRET;
+  if (secret && req.headers["x-cron-secret"] !== secret) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  try {
+    const Bookmark = mongoose.models["Bookmark"] ||
+      model("Bookmark", new Schema({ userId: Schema.Types.ObjectId, scholarshipId: { type: Schema.Types.ObjectId, ref: "Scholarship" } }, { timestamps: true }));
+
+    const allPrefs = await NotifPrefs.find({ emailEnabled: true });
+    let sent = 0;
+    const now = new Date();
+
+    for (const prefs of allPrefs) {
+      const user = await User.findById(prefs.userId);
+      if (!user) continue;
+
+      const bookmarks = await Bookmark.find({ userId: prefs.userId }).populate("scholarshipId");
+      const days = prefs.daysBeforeDeadline;
+
+      const upcoming = bookmarks
+        .map((b: any) => b.scholarshipId)
+        .filter((s: any) => {
+          if (!s?.deadline) return false;
+          const deadline = new Date(s.deadline);
+          const daysUntil = (deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+          return daysUntil >= 0 && daysUntil <= days;
+        })
+        .map((s: any) => ({ title: s.title, deadline: s.deadline, link: s.link }));
+
+      if (upcoming.length === 0) continue;
+
+      await sendDeadlineReminder(user.email, upcoming).catch((e) =>
+        console.error(`Reminder failed for ${user.email}:`, e)
+      );
+      sent++;
+    }
+
+    res.json({ message: `Reminders sent to ${sent} user(s).`, sent });
+  } catch (err) {
+    console.error("Cron reminder error:", err);
+    res.status(500).json({ error: "Failed to send cron reminders" });
+  }
+});
+
 export default router;

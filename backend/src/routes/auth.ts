@@ -1,7 +1,8 @@
 import { Router, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { User } from "../models/User";
-import { sendVerificationCode } from "../services/mailer";
+import { sendVerificationCode, sendPasswordChangeConfirmation } from "../services/mailer";
+import { requireAuth, AuthRequest } from "../middleware/auth";
 
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET || "fallback_secret";
@@ -168,7 +169,9 @@ router.post("/login", async (req: Request, res: Response) => {
       user.verificationCode = code;
       user.verificationCodeExpiry = new Date(Date.now() + 1000 * 60 * 60);
       await user.save();
-      await sendVerificationCode(user.email, code, "signup");
+      sendVerificationCode(user.email, code, "signup").catch((e) =>
+        console.error("Email send failed:", e)
+      );
       res.status(403).json({
         error: "Please verify your email before logging in.",
         needsVerification: true,
@@ -258,6 +261,43 @@ router.post("/reset-password", async (req: Request, res: Response) => {
   } catch (err) {
     console.error("Reset password error:", err);
     res.status(500).json({ error: "Failed to reset password." });
+  }
+});
+
+// POST /api/auth/change-password
+// Authenticated users change their password by providing the current one.
+router.post("/change-password", requireAuth, async (req: AuthRequest, res: Response) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      res.status(400).json({ error: "Current and new password are required." });
+      return;
+    }
+    if (newPassword.length < 8) {
+      res.status(400).json({ error: "New password must be at least 8 characters." });
+      return;
+    }
+
+    const user = await User.findById(req.userId);
+    if (!user) { res.status(404).json({ error: "User not found." }); return; }
+
+    const valid = await user.comparePassword(currentPassword);
+    if (!valid) {
+      res.status(401).json({ error: "Current password is incorrect." });
+      return;
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    sendPasswordChangeConfirmation(user.email, user.firstName).catch((e) =>
+      console.error("Password change email failed:", e)
+    );
+
+    res.json({ message: "Password changed successfully." });
+  } catch (err) {
+    console.error("Change password error:", err);
+    res.status(500).json({ error: "Failed to change password." });
   }
 });
 
