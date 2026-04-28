@@ -96,16 +96,23 @@ export default function ProfilePage() {
 
   useEffect(() => {
     async function loadProfile() {
+      // Seed name defaults from signup data
+      const authRaw = localStorage.getItem("user");
+      const authUser = authRaw ? JSON.parse(authRaw) : null;
+
       const token = localStorage.getItem("token");
-      // Try backend first if user is logged in
       if (token) {
         const remote = await getProfile(token);
         if (remote) {
           setIsExisting(true);
           const { languages: savedLangs, certDocs: savedDocs, _id, userId, __v, createdAt, updatedAt, ...rest } = remote as any;
-          setFormData((prev) => ({ ...prev, ...rest }));
+          setFormData((prev) => ({
+            ...prev,
+            firstName: authUser?.firstName || prev.firstName,
+            lastName: authUser?.lastName || prev.lastName,
+            ...rest,
+          }));
           if (savedLangs?.length) setLanguages(savedLangs);
-          // certDocs are only in localStorage (not stored in backend)
           const local = localStorage.getItem("scholarioProfile");
           if (local) {
             const parsed = JSON.parse(local);
@@ -120,9 +127,21 @@ export default function ProfilePage() {
         setIsExisting(true);
         const parsed = JSON.parse(saved);
         const { languages: savedLangs, certDocs: savedDocs, ...rest } = parsed;
-        setFormData((prev) => ({ ...prev, ...rest }));
+        setFormData((prev) => ({
+          ...prev,
+          firstName: authUser?.firstName || prev.firstName,
+          lastName: authUser?.lastName || prev.lastName,
+          ...rest,
+        }));
         if (savedLangs?.length) setLanguages(savedLangs);
         if (savedDocs?.length) setCertDocs(savedDocs);
+      } else if (authUser) {
+        // Brand new profile — seed name from signup
+        setFormData((prev) => ({
+          ...prev,
+          firstName: authUser.firstName || "",
+          lastName: authUser.lastName || "",
+        }));
       }
     }
     loadProfile();
@@ -171,6 +190,15 @@ export default function ProfilePage() {
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = e.target;
+    if (name === "dateOfBirth" && value) {
+      const today = new Date();
+      const dob = new Date(value);
+      let age = today.getFullYear() - dob.getFullYear();
+      const monthDiff = today.getMonth() - dob.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) age--;
+      setFormData((prev) => ({ ...prev, dateOfBirth: value, age: age > 0 ? String(age) : "" }));
+      return;
+    }
     setFormData((prev) => ({ ...prev, [name]: value }));
   }
 
@@ -313,12 +341,10 @@ export default function ProfilePage() {
                   <input
                     type="number"
                     name="age"
-                    placeholder="Age"
+                    placeholder="Age (auto-calculated)"
                     value={formData.age}
-                    onChange={handleChange}
-                    min="10"
-                    max="100"
-                    className={inputClass}
+                    readOnly
+                    className={`${inputClass} bg-slate-50 text-slate-500 cursor-default`}
                   />
                   <select name="nationality" value={formData.nationality} onChange={handleChange} className={inputClass}>
                     <option value="">Nationality</option>
