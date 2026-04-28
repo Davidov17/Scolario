@@ -1,20 +1,8 @@
-import * as Brevo from "@getbrevo/brevo";
+import https from "https";
 import nodemailer from "nodemailer";
 
 const BREVO_FROM_EMAIL = process.env.BREVO_FROM_EMAIL || "scholario.admin@gmail.com";
 const BREVO_FROM_NAME = "Scholario";
-
-let brevoClient: Brevo.TransactionalEmailsApi | null = null;
-
-function getBrevoClient(): Brevo.TransactionalEmailsApi {
-  if (brevoClient) return brevoClient;
-  brevoClient = new Brevo.TransactionalEmailsApi();
-  brevoClient.setApiKey(
-    Brevo.TransactionalEmailsApiApiKeys.apiKey,
-    process.env.BREVO_API_KEY!
-  );
-  return brevoClient;
-}
 
 let etherealTransporter: nodemailer.Transporter | null = null;
 
@@ -29,6 +17,46 @@ async function getEtherealTransporter(): Promise<nodemailer.Transporter> {
   });
   console.log("📧 Ethereal test account created:", testAccount.user);
   return etherealTransporter;
+}
+
+async function sendViaBrevo(to: string, subject: string, html: string): Promise<void> {
+  const payload = JSON.stringify({
+    sender: { name: BREVO_FROM_NAME, email: BREVO_FROM_EMAIL },
+    to: [{ email: to }],
+    subject,
+    htmlContent: html,
+  });
+
+  return new Promise((resolve, reject) => {
+    const req = https.request(
+      {
+        hostname: "api.brevo.com",
+        path: "/v3/smtp/email",
+        method: "POST",
+        headers: {
+          accept: "application/json",
+          "api-key": process.env.BREVO_API_KEY!,
+          "content-type": "application/json",
+          "content-length": Buffer.byteLength(payload),
+        },
+      },
+      (res) => {
+        let data = "";
+        res.on("data", (chunk) => (data += chunk));
+        res.on("end", () => {
+          if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
+            console.log("📧 Brevo sent:", res.statusCode, data);
+            resolve();
+          } else {
+            reject(new Error(`Brevo API error ${res.statusCode}: ${data}`));
+          }
+        });
+      }
+    );
+    req.on("error", reject);
+    req.write(payload);
+    req.end();
+  });
 }
 
 /** Sends a 6-digit verification code email for signup or password reset. */
@@ -65,21 +93,13 @@ export async function sendVerificationCode(
   `;
 
   if (process.env.BREVO_API_KEY) {
-    const client = getBrevoClient();
-    const sendSmtpEmail = new Brevo.SendSmtpEmail();
-    sendSmtpEmail.subject = subject;
-    sendSmtpEmail.htmlContent = html;
-    sendSmtpEmail.sender = { name: BREVO_FROM_NAME, email: BREVO_FROM_EMAIL };
-    sendSmtpEmail.to = [{ email: to }];
-    const result = await client.sendTransacEmail(sendSmtpEmail);
-    console.log("📧 Brevo result:", JSON.stringify(result.body));
+    await sendViaBrevo(to, subject, html);
     return;
   }
 
-  // Fallback to Ethereal for local dev
   const t = await getEtherealTransporter();
   const info = await t.sendMail({
-    from: '"Scholario" <no-reply@scholario.app>',
+    from: `"${BREVO_FROM_NAME}" <no-reply@scholario.app>`,
     to,
     subject,
     html,
@@ -92,6 +112,7 @@ export async function sendPasswordChangeConfirmation(
   to: string,
   firstName: string
 ): Promise<void> {
+  const subject = "Your Scholario password was changed";
   const html = `
     <div style="font-family:sans-serif;max-width:480px;margin:0 auto;color:#1e293b">
       <div style="background:#4f46e5;padding:32px 32px 24px;border-radius:16px 16px 0 0;text-align:center">
@@ -107,21 +128,15 @@ export async function sendPasswordChangeConfirmation(
   `;
 
   if (process.env.BREVO_API_KEY) {
-    const client = getBrevoClient();
-    const sendSmtpEmail = new Brevo.SendSmtpEmail();
-    sendSmtpEmail.subject = "Your Scholario password was changed";
-    sendSmtpEmail.htmlContent = html;
-    sendSmtpEmail.sender = { name: BREVO_FROM_NAME, email: BREVO_FROM_EMAIL };
-    sendSmtpEmail.to = [{ email: to }];
-    await client.sendTransacEmail(sendSmtpEmail);
+    await sendViaBrevo(to, subject, html);
     return;
   }
 
   const t = await getEtherealTransporter();
   const info = await t.sendMail({
-    from: '"Scholario" <no-reply@scholario.app>',
+    from: `"${BREVO_FROM_NAME}" <no-reply@scholario.app>`,
     to,
-    subject: "Your Scholario password was changed",
+    subject,
     html,
   });
   const previewUrl = nodemailer.getTestMessageUrl(info);
@@ -143,6 +158,7 @@ export async function sendDeadlineReminder(
     )
     .join("");
 
+  const subject = `Scholarship Deadline Reminder — ${scholarships.length} upcoming deadline${scholarships.length > 1 ? "s" : ""}`;
   const html = `
     <div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#1e293b">
       <h2 style="color:#4f46e5">Upcoming Scholarship Deadlines</h2>
@@ -154,22 +170,14 @@ export async function sendDeadlineReminder(
     </div>
   `;
 
-  const subject = `Scholarship Deadline Reminder — ${scholarships.length} upcoming deadline${scholarships.length > 1 ? "s" : ""}`;
-
   if (process.env.BREVO_API_KEY) {
-    const client = getBrevoClient();
-    const sendSmtpEmail = new Brevo.SendSmtpEmail();
-    sendSmtpEmail.subject = subject;
-    sendSmtpEmail.htmlContent = html;
-    sendSmtpEmail.sender = { name: BREVO_FROM_NAME, email: BREVO_FROM_EMAIL };
-    sendSmtpEmail.to = [{ email: to }];
-    await client.sendTransacEmail(sendSmtpEmail);
+    await sendViaBrevo(to, subject, html);
     return null;
   }
 
   const t = await getEtherealTransporter();
   const info = await t.sendMail({
-    from: '"Scholario" <no-reply@scholario.app>',
+    from: `"${BREVO_FROM_NAME}" <no-reply@scholario.app>`,
     to,
     subject,
     html,
