@@ -55,6 +55,7 @@ export default function LoginPage() {
       }
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.removeItem("scholarioProfile");
       router.push("/user");
     } catch {
       setError("Could not connect to server. Please try again.");

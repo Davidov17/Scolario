@@ -120,6 +120,7 @@ function SignupForm() {
       if (!res.ok) { setError(data.error || "Verification failed."); return; }
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.removeItem("scholarioProfile");
       setSuccess("Email verified! Redirecting…");
       setTimeout(() => router.push("/profile"), 1000);
     } catch {
