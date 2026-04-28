@@ -44,8 +44,8 @@ async function sendViaBrevo(to: string, subject: string, html: string): Promise<
         let data = "";
         res.on("data", (chunk) => (data += chunk));
         res.on("end", () => {
+          console.log(`📧 Brevo response ${res.statusCode}: ${data}`);
           if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
-            console.log("📧 Brevo sent:", res.statusCode, data);
             resolve();
           } else {
             reject(new Error(`Brevo API error ${res.statusCode}: ${data}`));
