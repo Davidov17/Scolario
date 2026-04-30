@@ -26,8 +26,8 @@ export default async function Home() {
                 "url('https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1920&q=80')",
             }}
           />
-          <div className="absolute inset-0 bg-slate-900/55" />
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/30 via-transparent to-slate-900/70" />
+          <div className="absolute inset-0 bg-slate-900/70" />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 via-transparent to-slate-900/80" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_70%_0%,_#4f46e520,_transparent)]" />
 
           <div className="relative w-full max-w-6xl mx-auto px-8 py-28 text-center">
