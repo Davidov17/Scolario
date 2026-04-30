@@ -19,17 +19,16 @@ export default async function Home() {
 
         {/* ── HERO ─────────────────────────────────────────────── */}
         <section className="relative text-white overflow-hidden min-h-[90vh] flex items-center">
-          {/* Photo — overlay at 45% so it's clearly visible */}
           <div
             className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105"
             style={{
               backgroundImage:
-                "url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1920&q=80')",
+                "url('https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1920&q=80')",
             }}
           />
-          <div className="absolute inset-0 bg-slate-900/50" />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-900/60" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_70%_0%,_#4f46e528,_transparent)]" />
+          <div className="absolute inset-0 bg-slate-900/55" />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/30 via-transparent to-slate-900/70" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_70%_0%,_#4f46e520,_transparent)]" />
 
           <div className="relative w-full max-w-6xl mx-auto px-8 py-28 text-center">
             <div className="inline-flex items-center gap-2 bg-white/10 border border-white/25 backdrop-blur-sm rounded-full px-4 py-1.5 text-sm text-slate-200 mb-8">
