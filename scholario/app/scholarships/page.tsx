@@ -107,12 +107,12 @@ export default function ScholarshipsPage() {
   }, []);
 
   const countries = useMemo(() => {
-    const set = new Set(all.map((s) => s.country).filter(Boolean));
+    const set = new Set(all.map((s) => s.country).filter((c): c is string => !!c));
     return ["All", ...Array.from(set).sort()];
   }, [all]);
 
   const degrees = useMemo(() => {
-    const set = new Set(all.map((s) => s.degreeLevel).filter(Boolean));
+    const set = new Set(all.map((s) => s.degreeLevel).filter((d): d is string => !!d));
     return ["All", ...Array.from(set).sort()];
   }, [all]);
 
@@ -155,12 +155,13 @@ export default function ScholarshipsPage() {
       !bachelors.includes(s) && !masters.includes(s)
   );
 
-  const hasActiveFilters =
+  const hasActiveFilters = !!(
     search ||
     filterDegree !== "All" ||
     filterFunding !== "All" ||
     filterCountry !== "All" ||
-    filterStatus !== "Active";
+    filterStatus !== "Active"
+  );
 
   function clearFilters() {
     setSearch("");
@@ -254,7 +255,7 @@ export default function ScholarshipsPage() {
                 </button>
               )}
             </div>
-            {(hasActiveFilters || filterStatus !== "All") && (
+            {filtered.length < all.length && (
               <p className="text-xs text-slate-400 mt-3">
                 Showing <span className="font-semibold text-slate-700">{filtered.length}</span> of {all.length} scholarships
               </p>
