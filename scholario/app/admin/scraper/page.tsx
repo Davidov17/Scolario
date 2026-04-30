@@ -79,7 +79,7 @@ export default function AdminScraperPage() {
       <button
         onClick={handleRun}
         disabled={running}
-        className="flex items-center gap-2.5 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white rounded-xl text-sm font-semibold transition-colors"
+        className="flex items-center gap-2.5 px-6 py-3 bg-indigo-700 hover:bg-indigo-800 disabled:opacity-60 text-white rounded-xl text-sm font-semibold transition-colors"
       >
         {running ? (
           <>

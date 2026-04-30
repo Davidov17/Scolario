@@ -64,7 +64,7 @@ export default function ForgotPasswordPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl font-semibold text-sm transition-colors disabled:opacity-60"
+                    className="w-full bg-indigo-700 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold text-sm transition-colors disabled:opacity-60"
                   >
                     {loading ? "Sending…" : "Send Reset Code"}
                   </button>
@@ -84,7 +84,7 @@ export default function ForgotPasswordPage() {
                 </p>
                 <button
                   onClick={() => router.push(`/reset-password?email=${encodeURIComponent(email)}`)}
-                  className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl font-semibold text-sm transition-colors"
+                  className="w-full bg-indigo-700 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold text-sm transition-colors"
                 >
                   Enter Reset Code →
                 </button>

@@ -188,7 +188,7 @@ export default function SettingsPage() {
               <button
                 type="submit"
                 disabled={pwLoading}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold text-sm transition-colors disabled:opacity-60"
+                className="w-full bg-indigo-700 hover:bg-indigo-800 text-white py-3 rounded-xl font-semibold text-sm transition-colors disabled:opacity-60"
               >
                 {pwLoading ? "Changing…" : "Change Password"}
               </button>
@@ -209,7 +209,7 @@ export default function SettingsPage() {
                     type="button"
                     onClick={() => setEmailEnabled((v) => !v)}
                     className={`relative w-11 h-6 rounded-full transition-colors focus:outline-none ${
-                      emailEnabled ? "bg-indigo-600" : "bg-slate-200"
+                      emailEnabled ? "bg-indigo-700" : "bg-slate-200"
                     }`}
                   >
                     <span
@@ -249,7 +249,7 @@ export default function SettingsPage() {
                 <button
                   type="submit"
                   disabled={prefsLoading}
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold text-sm transition-colors disabled:opacity-60"
+                  className="w-full bg-indigo-700 hover:bg-indigo-800 text-white py-3 rounded-xl font-semibold text-sm transition-colors disabled:opacity-60"
                 >
                   {prefsLoading ? "Saving…" : "Save Preferences"}
                 </button>

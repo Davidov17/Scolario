@@ -167,7 +167,7 @@ export default function Page() {
             <p className="text-slate-500 mb-8">This scholarship may have been removed or the link is incorrect.</p>
             <Link
               href="/scholarships"
-              className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-medium transition-colors"
+              className="inline-block bg-indigo-700 hover:bg-indigo-800 text-white px-6 py-3 rounded-xl font-medium transition-colors"
             >
               ← Back to Scholarships
             </Link>
@@ -271,7 +271,7 @@ export default function Page() {
                   href={data.link}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-block bg-indigo-600 hover:bg-indigo-500 text-white px-7 py-3 rounded-xl font-semibold shadow-sm hover:shadow-indigo-500/20 hover:shadow-md transition-all"
+                  className="inline-block bg-indigo-700 hover:bg-indigo-700 text-white px-7 py-3 rounded-xl font-semibold shadow-sm hover:shadow-indigo-500/20 hover:shadow-md transition-all"
                 >
                   Apply Now →
                 </a>
@@ -356,7 +356,7 @@ export default function Page() {
                 <button
                   onClick={handleSaveApplication}
                   disabled={appSaving}
-                  className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-semibold transition-colors disabled:opacity-60"
+                  className="px-6 py-2.5 bg-indigo-700 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition-colors disabled:opacity-60"
                 >
                   {appSaving ? "Saving…" : appSaved ? "Saved!" : "Save Status"}
                 </button>

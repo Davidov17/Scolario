@@ -47,7 +47,7 @@ export default function Navbar() {
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-indigo-700 rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-sm tracking-tight">S</span>
           </div>
           <span className="text-lg font-bold text-slate-900 tracking-tight">Scholario</span>
@@ -98,7 +98,7 @@ export default function Navbar() {
               </Link>
               <Link
                 href="/login"
-                className="ml-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors text-sm font-medium"
+                className="ml-1 px-4 py-2 bg-indigo-700 hover:bg-indigo-800 text-white rounded-lg transition-colors text-sm font-medium"
               >
                 Log In
               </Link>

@@ -132,7 +132,7 @@ export default function MatchesPage() {
               </p>
               <Link
                 href="/profile"
-                className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-3 rounded-xl"
+                className="inline-block bg-indigo-700 hover:bg-indigo-800 text-white px-5 py-3 rounded-xl"
               >
                 Go to Profile
               </Link>
@@ -187,7 +187,7 @@ export default function MatchesPage() {
 
                   <Link
                     href={`/scholarships/${scholarship.id}`}
-                    className="mt-auto block text-center bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl"
+                    className="mt-auto block text-center bg-indigo-700 hover:bg-indigo-800 text-white py-3 rounded-xl"
                   >
                     View Details
                   </Link>

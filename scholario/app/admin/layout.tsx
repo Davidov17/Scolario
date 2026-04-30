@@ -69,7 +69,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Logo */}
         <div className="px-6 py-5 border-b border-slate-100">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center shrink-0">
+            <div className="w-7 h-7 bg-indigo-700 rounded-lg flex items-center justify-center shrink-0">
               <span className="text-white font-bold text-xs">S</span>
             </div>
             <div>

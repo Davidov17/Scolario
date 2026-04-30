@@ -46,7 +46,7 @@ function ScholarshipCard({ s }: { s: Scholarship }) {
 
       <Link
         href={`/scholarships/${s._id}`}
-        className="block w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-center text-sm font-medium transition-colors"
+        className="block w-full bg-indigo-700 hover:bg-indigo-800 text-white py-2.5 rounded-xl text-center text-sm font-medium transition-colors"
       >
         View Details
       </Link>

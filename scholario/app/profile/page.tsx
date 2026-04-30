@@ -592,7 +592,7 @@ export default function ProfilePage() {
 
             <button
               type="submit"
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 rounded-xl font-semibold text-sm transition-colors shadow-sm"
+              className="w-full bg-indigo-700 hover:bg-indigo-800 text-white py-3.5 rounded-xl font-semibold text-sm transition-colors shadow-sm"
             >
               Save Profile
             </button>

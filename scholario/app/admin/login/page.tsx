@@ -55,7 +55,7 @@ export default function AdminLoginPage() {
 
         {/* Logo */}
         <div className="flex items-center justify-center gap-2.5 mb-10">
-          <div className="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center">
+          <div className="w-9 h-9 bg-indigo-700 rounded-xl flex items-center justify-center">
             <span className="text-white font-bold text-base">S</span>
           </div>
           <span className="text-xl font-bold text-slate-900 tracking-tight">Scholario</span>
@@ -103,7 +103,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold text-sm transition-colors disabled:opacity-60 mt-2"
+              className="w-full bg-indigo-700 hover:bg-indigo-800 text-white py-3 rounded-xl font-semibold text-sm transition-colors disabled:opacity-60 mt-2"
             >
               {loading ? "Signing in…" : "Sign In"}
             </button>

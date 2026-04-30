@@ -266,7 +266,7 @@ function SignupForm() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold text-sm transition-colors shadow-sm disabled:opacity-60"
+                    className="w-full bg-indigo-700 hover:bg-indigo-800 text-white py-3 rounded-xl font-semibold text-sm transition-colors shadow-sm disabled:opacity-60"
                   >
                     {loading ? "Creating account…" : "Create Account"}
                   </button>
@@ -319,7 +319,7 @@ function SignupForm() {
                   <button
                     type="submit"
                     disabled={loading || code.length !== 6}
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold text-sm transition-colors shadow-sm disabled:opacity-60"
+                    className="w-full bg-indigo-700 hover:bg-indigo-800 text-white py-3 rounded-xl font-semibold text-sm transition-colors shadow-sm disabled:opacity-60"
                   >
                     {loading ? "Verifying…" : "Verify Email"}
                   </button>

@@ -213,7 +213,7 @@ export default function UserPage() {
           <div className="grid md:grid-cols-2 gap-5 mb-10">
             <Link
               href="/scholarships"
-              className="group bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl p-6 shadow-sm transition-colors"
+              className="group bg-indigo-700 hover:bg-indigo-800 text-white rounded-2xl p-6 shadow-sm transition-colors"
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -272,7 +272,7 @@ export default function UserPage() {
                   <p className="text-slate-400 mb-5">No matches found yet.</p>
                   <Link
                     href="/profile"
-                    className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-colors"
+                    className="inline-block bg-indigo-700 hover:bg-indigo-800 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-colors"
                   >
                     Update your profile →
                   </Link>
@@ -326,7 +326,7 @@ export default function UserPage() {
                       )}
                       <Link
                         href={`/scholarships/${s._id}`}
-                        className="block text-center bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl text-xs font-semibold transition-colors"
+                        className="block text-center bg-indigo-700 hover:bg-indigo-800 text-white py-2 rounded-xl text-xs font-semibold transition-colors"
                       >
                         View Details
                       </Link>
@@ -426,7 +426,7 @@ export default function UserPage() {
                     setNotifSaving(false);
                     setTimeout(() => setNotifMsg(""), 2500);
                   }}
-                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-semibold transition-colors disabled:opacity-60"
+                  className="px-5 py-2 bg-indigo-700 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition-colors disabled:opacity-60"
                 >
                   {notifSaving ? "Saving…" : "Save Preferences"}
                 </button>
@@ -485,7 +485,7 @@ export default function UserPage() {
                       </div>
                       <Link
                         href={`/scholarships/${s._id}`}
-                        className="block text-center bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl text-xs font-semibold transition-colors"
+                        className="block text-center bg-indigo-700 hover:bg-indigo-800 text-white py-2 rounded-xl text-xs font-semibold transition-colors"
                       >
                         View Details
                       </Link>
